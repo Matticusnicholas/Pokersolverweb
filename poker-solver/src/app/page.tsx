@@ -1,19 +1,30 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
-import BoardSelector from '@/components/BoardSelector';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { CardIndex, Suit, indexToCard } from '@/engine/types';
-import { calculateEquityVsRange, potOdds } from '@/engine/equity';
-import { parseRange, DEFAULT_RANGES } from '@/engine/ranges';
+
+// Lazy-load heavy engine modules to avoid blocking hydration
+const BoardSelector = dynamic(() => import('@/components/BoardSelector'), { ssr: true });
+
+let _eqModule: typeof import('@/engine/equity') | null = null;
+let _rangeModule: typeof import('@/engine/ranges') | null = null;
+
+async function loadEngineModules() {
+  if (!_eqModule) _eqModule = await import('@/engine/equity');
+  if (!_rangeModule) _rangeModule = await import('@/engine/ranges');
+  return { eq: _eqModule, ranges: _rangeModule };
+}
 
 // --- Constants ---
 const SUIT_SYM: Record<Suit, string> = { s: '\u2660', h: '\u2665', d: '\u2666', c: '\u2663' };
 const POSITIONS = ['UTG', 'MP', 'CO', 'BTN', 'SB', 'BB'];
 const OPEN_SIZES = [2, 2.5, 3, 4];
 
-function getVillainRange(pos: string): number[] {
+async function getVillainRange(pos: string): Promise<number[]> {
+  const { ranges } = await loadEngineModules();
   const key = `${pos}_RFI`;
-  return parseRange(DEFAULT_RANGES[key] || DEFAULT_RANGES['BTN_RFI'] || '');
+  return ranges.parseRange(ranges.DEFAULT_RANGES[key] || ranges.DEFAULT_RANGES['BTN_RFI'] || '');
 }
 
 interface EqResult { equity: number; wins: number; ties: number; losses: number; samples: number; }
@@ -25,7 +36,7 @@ function getAdvice(equity: number, pot: number, bet: number): Advice {
     if (equity >= 0.45) return { action: 'CHECK', color: '#9ca3af', bg: 'rgba(107,114,128,0.12)', border: 'rgba(107,114,128,0.3)', reason: `Medium strength (${(equity * 100).toFixed(0)}%) \u2014 pot control` };
     return { action: 'CHECK', color: '#6b7280', bg: 'rgba(107,114,128,0.1)', border: 'rgba(107,114,128,0.2)', reason: `Weak (${(equity * 100).toFixed(0)}%) \u2014 check and reassess` };
   }
-  const need = potOdds(pot, bet);
+  const need = bet / (pot + bet); // pot odds inline to avoid import
   if (equity >= need + 0.15) return { action: 'RAISE', color: '#fbbf24', bg: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.3)', reason: `${(equity * 100).toFixed(0)}% equity >> ${(need * 100).toFixed(0)}% needed` };
   if (equity >= need) return { action: 'CALL', color: '#34d399', bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.3)', reason: `${(equity * 100).toFixed(0)}% equity \u2265 ${(need * 100).toFixed(0)}% needed` };
   if (equity >= need - 0.05) return { action: 'CLOSE', color: '#fb923c', bg: 'rgba(249,115,22,0.12)', border: 'rgba(249,115,22,0.3)', reason: `${(equity * 100).toFixed(0)}% \u2248 ${(need * 100).toFixed(0)}% needed \u2014 borderline` };
@@ -215,20 +226,23 @@ export default function HandAdvisor() {
   const [riverEq, setRiverEq] = useState<EqResult | null>(null);
   const [calculating, setCalculating] = useState(false);
 
-  const villainRange = useMemo(() => getVillainRange(villainPos), [villainPos]);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setHydrated(true); }, []);
 
   const calcEquity = useCallback(async (board: CardIndex[]): Promise<EqResult | null> => {
     if (heroCards.length < 2) return null;
     setCalculating(true);
     await new Promise(r => setTimeout(r, 10));
     try {
-      return calculateEquityVsRange(
+      const { eq } = await loadEngineModules();
+      const range = await getVillainRange(villainPos);
+      return eq.calculateEquityVsRange(
         [heroCards[0], heroCards[1]] as [CardIndex, CardIndex],
-        villainRange, board, 25000,
+        range, board, 25000,
       );
     } catch { return null; }
     finally { setCalculating(false); }
-  }, [heroCards, villainRange]);
+  }, [heroCards, villainPos]);
 
   const toStep2 = () => { if (heroCards.length >= 2) setStep(2); };
   const toFlop = async () => {
@@ -283,6 +297,16 @@ export default function HandAdvisor() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Hydration indicator - green dot = JS active, gray = static HTML */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 4px' }}>
+        <span style={{
+          fontSize: 10, padding: '2px 8px', borderRadius: 8,
+          background: hydrated ? 'rgba(34,197,94,0.15)' : 'rgba(107,114,128,0.15)',
+          color: hydrated ? '#22c55e' : '#6b7280',
+        }}>
+          {hydrated ? '\u25cf JS Active' : '\u25cb Loading...'}
+        </span>
+      </div>
       {/* Progress bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
         {stepLabels.map((label, i) => {
