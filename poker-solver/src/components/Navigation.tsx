@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
-  { href: '/', label: 'Solver', icon: '\u2660' },
+  { href: '/', label: 'Hand', icon: '\u2660' },
   { href: '/preflop/', label: 'Preflop', icon: '\u2665' },
   { href: '/equity/', label: 'Equity', icon: '\u2666' },
 ];

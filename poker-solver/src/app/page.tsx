@@ -1,352 +1,563 @@
 'use client';
 
-import React, { useState, useCallback, useRef } from 'react';
-import RangeEditor from '@/components/RangeEditor';
+import React, { useState, useCallback, useMemo } from 'react';
 import BoardSelector from '@/components/BoardSelector';
-import { SolverProgress, ActionBreakdown, PotOddsDisplay } from '@/components/EVDisplay';
-import StrategyDisplay, { solverResultsToStrategy } from '@/components/StrategyDisplay';
-import { CardIndex, Street, STREET_NAMES, SolverConfig } from '@/engine/types';
-import { CFRSolver } from '@/engine/cfr';
-import { gridToRange, rangeToGrid, parseRange, DEFAULT_RANGES } from '@/engine/ranges';
+import { EquityBar } from '@/components/EVDisplay';
+import { CardIndex, Suit, indexToCard } from '@/engine/types';
+import { calculateEquityVsRange, potOdds } from '@/engine/equity';
+import { parseRange, DEFAULT_RANGES } from '@/engine/ranges';
 
-interface SolverState {
-  running: boolean;
-  iteration: number;
-  exploitability: number;
-  timeMs: number;
-  nodeCount: number;
-  results: {
-    actions: string[];
-    handStrategies: Map<number, Float32Array>;
-    overallFrequencies: Float32Array;
-  } | null;
+// --- Constants ---
+const SUIT_SYM: Record<Suit, string> = { s: '\u2660', h: '\u2665', d: '\u2666', c: '\u2663' };
+const SUIT_CLR: Record<Suit, string> = { s: 'text-gray-200', h: 'text-red-400', d: 'text-red-400', c: 'text-gray-200' };
+const CARD_CLR: Record<Suit, string> = { s: 'text-gray-900', h: 'text-red-600', d: 'text-red-500', c: 'text-gray-900' };
+
+const POSITIONS = ['UTG', 'MP', 'CO', 'BTN', 'SB', 'BB'];
+const OPEN_SIZES = [2, 2.5, 3, 4];
+
+function getVillainRange(pos: string): number[] {
+  const key = `${pos}_RFI`;
+  return parseRange(DEFAULT_RANGES[key] || DEFAULT_RANGES['BTN_RFI'] || '');
 }
 
-export default function SolverPage() {
-  // Step tracking
-  const [step, setStep] = useState(1);
+interface EqResult { equity: number; wins: number; ties: number; losses: number; samples: number; }
+interface Advice { action: string; color: string; bg: string; reason: string; }
 
-  // Game config
-  const [street, setStreet] = useState<Street>(Street.FLOP);
-  const [board, setBoard] = useState<CardIndex[]>([]);
-  const [stackDepth, setStackDepth] = useState(100);
-  const [potSize, setPotSize] = useState(6);
-  const [maxIterations, setMaxIterations] = useState(10000);
-  const [targetExploitability, setTargetExploitability] = useState(0.5);
+function getAdvice(equity: number, pot: number, bet: number): Advice {
+  if (bet <= 0) {
+    if (equity >= 0.65) return { action: 'BET', color: 'text-blue-400', bg: 'bg-blue-950/50 border-blue-800/50', reason: `Strong (${(equity * 100).toFixed(0)}% equity) \u2014 bet for value` };
+    if (equity >= 0.45) return { action: 'CHECK', color: 'text-gray-300', bg: 'bg-gray-800/50 border-gray-700/50', reason: `Medium strength (${(equity * 100).toFixed(0)}%) \u2014 control the pot` };
+    return { action: 'CHECK', color: 'text-gray-400', bg: 'bg-gray-800/50 border-gray-700/50', reason: `Weak (${(equity * 100).toFixed(0)}%) \u2014 check and reassess` };
+  }
+  const need = potOdds(pot, bet);
+  if (equity >= need + 0.15) return { action: 'RAISE', color: 'text-yellow-300', bg: 'bg-yellow-950/50 border-yellow-700/50', reason: `${(equity * 100).toFixed(0)}% equity >> ${(need * 100).toFixed(0)}% needed \u2014 raise for value!` };
+  if (equity >= need) return { action: 'CALL', color: 'text-green-400', bg: 'bg-green-950/50 border-green-800/50', reason: `${(equity * 100).toFixed(0)}% equity \u2265 ${(need * 100).toFixed(0)}% needed` };
+  if (equity >= need - 0.05) return { action: 'CLOSE DECISION', color: 'text-orange-400', bg: 'bg-orange-950/50 border-orange-800/50', reason: `${(equity * 100).toFixed(0)}% equity \u2248 ${(need * 100).toFixed(0)}% needed \u2014 borderline` };
+  return { action: 'FOLD', color: 'text-red-400', bg: 'bg-red-950/50 border-red-800/50', reason: `${(equity * 100).toFixed(0)}% equity < ${(need * 100).toFixed(0)}% needed` };
+}
 
-  // Bet sizes
-  const [flopBets, setFlopBets] = useState('0.33,0.67,1.0');
-  const [turnBets, setTurnBets] = useState('0.5,0.75,1.0');
-  const [riverBets, setRiverBets] = useState('0.5,0.75,1.0,1.5');
-  const [flopRaises, setFlopRaises] = useState('0.5,1.0');
-  const [turnRaises, setTurnRaises] = useState('0.5,1.0');
-  const [riverRaises, setRiverRaises] = useState('0.5,1.0');
-
-  // Ranges
-  const [oopGrid, setOopGrid] = useState<number[][]>(() =>
-    rangeToGrid(parseRange(DEFAULT_RANGES['BB_3BET_vs_BTN']))
+// --- Sub-components ---
+function HeroMini({ cards }: { cards: CardIndex[] }) {
+  if (cards.length < 2) return null;
+  return (
+    <div className="flex items-center gap-1.5">
+      {cards.map(idx => {
+        const c = indexToCard(idx);
+        return (
+          <span key={idx} className={`text-lg font-bold ${SUIT_CLR[c.suit]}`}>
+            {c.rank}{SUIT_SYM[c.suit]}
+          </span>
+        );
+      })}
+    </div>
   );
-  const [ipGrid, setIpGrid] = useState<number[][]>(() =>
-    rangeToGrid(parseRange(DEFAULT_RANGES['BTN_RFI']))
+}
+
+function BoardMini({ cards }: { cards: CardIndex[] }) {
+  if (cards.length === 0) return null;
+  return (
+    <div className="flex items-center gap-1">
+      {cards.map(idx => {
+        const c = indexToCard(idx);
+        return (
+          <div key={idx} className="w-8 h-11 rounded bg-[var(--card-white)] flex flex-col items-center justify-center shadow-sm">
+            <span className={`text-[10px] font-bold ${CARD_CLR[c.suit]}`}>{c.rank}</span>
+            <span className={`text-[9px] ${CARD_CLR[c.suit]}`}>{SUIT_SYM[c.suit]}</span>
+          </div>
+        );
+      })}
+    </div>
   );
-  const [oopPreset, setOopPreset] = useState('BB_3BET_vs_BTN');
-  const [ipPreset, setIpPreset] = useState('BTN_RFI');
+}
 
-  // Range section toggles
-  const [showRanges, setShowRanges] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
+function AdviceBanner({ advice, label }: { advice: Advice; label: string }) {
+  return (
+    <div className={`p-4 rounded-xl border text-center ${advice.bg}`}>
+      <div className="text-[10px] text-gray-500 uppercase mb-1">{label}</div>
+      <div className={`text-3xl font-black mb-1 ${advice.color}`}>{advice.action}</div>
+      <div className="text-xs text-gray-400">{advice.reason}</div>
+    </div>
+  );
+}
 
-  // Solver state
-  const [solver, setSolverState] = useState<SolverState>({
-    running: false, iteration: 0, exploitability: Infinity,
-    timeMs: 0, nodeCount: 0, results: null,
-  });
-
-  const solverRef = useRef<CFRSolver | null>(null);
-
-  // Quick pot odds calc
-  const [betAmount, setBetAmount] = useState(4);
-
-  const handleRangePreset = (player: 'oop' | 'ip', preset: string) => {
-    const range = parseRange(DEFAULT_RANGES[preset] || '');
-    const grid = rangeToGrid(range);
-    if (player === 'oop') { setOopGrid(grid); setOopPreset(preset); }
-    else { setIpGrid(grid); setIpPreset(preset); }
-  };
-
-  const parseBetSizes = (str: string): number[] =>
-    str.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n) && n > 0);
-
-  const requiredCards = street === Street.FLOP ? 3 : street === Street.TURN ? 4 : 5;
-  const canSolve = board.length >= requiredCards;
-
-  const startSolver = useCallback(async () => {
-    const config: SolverConfig = {
-      numPlayers: 2, stackDepth, potSize, street, board,
-      playerRanges: [gridToRange(oopGrid), gridToRange(ipGrid)],
-      betSizes: [[], parseBetSizes(flopBets), parseBetSizes(turnBets), parseBetSizes(riverBets)],
-      raiseSizes: [[], parseBetSizes(flopRaises), parseBetSizes(turnRaises), parseBetSizes(riverRaises)],
-      maxIterations, targetExploitability, useGPU: true,
-    };
-
-    const cfr = new CFRSolver(config);
-    solverRef.current = cfr;
-    const startTime = performance.now();
-
-    setSolverState(prev => ({ ...prev, running: true, iteration: 0, exploitability: Infinity, timeMs: 0, nodeCount: 0, results: null }));
-
-    cfr.onProgress = (iteration, exploitability) => {
-      setSolverState(prev => ({
-        ...prev, iteration, exploitability,
-        timeMs: performance.now() - startTime,
-        nodeCount: cfr.getAggregatedStrategy(0).handStrategies.size,
-      }));
-    };
-
-    try {
-      await cfr.solve();
-      const oopStrategy = cfr.getAggregatedStrategy(0);
-      setSolverState(prev => ({ ...prev, running: false, timeMs: performance.now() - startTime, results: oopStrategy }));
-      setStep(3);
-    } catch (err) {
-      console.error('Solver error:', err);
-      setSolverState(prev => ({ ...prev, running: false }));
-    }
-  }, [stackDepth, potSize, street, board, oopGrid, ipGrid, flopBets, turnBets, riverBets, flopRaises, turnRaises, riverRaises, maxIterations, targetExploitability]);
-
-  const stopSolver = () => {
-    solverRef.current?.cancel();
-    setSolverState(prev => ({ ...prev, running: false }));
-  };
-
-  const rangePresets = Object.keys(DEFAULT_RANGES);
+function BetButtons({ pot, value, onChange }: { pot: number; value: number; onChange: (v: number) => void }) {
+  const presets = [
+    { label: 'Checks', bb: 0 },
+    { label: '\u2153 Pot', bb: Math.round(pot / 3 * 10) / 10 },
+    { label: '\u00bd Pot', bb: Math.round(pot / 2 * 10) / 10 },
+    { label: '\u2154 Pot', bb: Math.round(pot * 2 / 3 * 10) / 10 },
+    { label: 'Pot', bb: Math.round(pot * 10) / 10 },
+  ];
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="text-xl font-bold">
-          <span className="text-[var(--gold)]">GTO</span> Solver
-        </h1>
-        <p className="text-xs text-gray-500 mt-0.5">Pick cards, set ranges, find the optimal play</p>
-      </div>
-
-      {/* Step 1: Street + Board */}
-      <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800/50">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="w-6 h-6 rounded-full bg-[var(--gold)] text-black text-xs font-bold flex items-center justify-center">1</span>
-          <h2 className="text-sm font-semibold">Choose the Board</h2>
-        </div>
-
-        {/* Street selector */}
-        <div className="flex gap-2 mb-4">
-          {[Street.FLOP, Street.TURN, Street.RIVER].map(s => (
-            <button
-              key={s}
-              onClick={() => { setStreet(s); setBoard(board.slice(0, s === Street.FLOP ? 3 : s === Street.TURN ? 4 : 5)); }}
-              className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all
-                ${street === s
-                  ? 'bg-[var(--gold)] text-black'
-                  : 'bg-gray-800 text-gray-400 active:bg-gray-700'
-                }`}
-            >
-              {STREET_NAMES[s]}
-            </button>
-          ))}
-        </div>
-
-        {/* Board cards */}
-        <div className="felt-bg rounded-xl p-4">
-          <BoardSelector
-            selectedCards={board}
-            onCardsChange={setBoard}
-            maxCards={requiredCards}
-            label={`Pick ${requiredCards} board cards`}
-          />
-        </div>
-
-        {canSolve && !solver.running && step < 2 && (
+    <div className="space-y-2">
+      <div className="text-sm font-semibold text-gray-300">Villain&apos;s action:</div>
+      <div className="flex gap-1.5">
+        {presets.map(p => (
           <button
-            onClick={() => setStep(2)}
-            className="w-full mt-3 py-2 rounded-lg text-sm font-semibold bg-gray-800 text-[var(--gold)] active:bg-gray-700"
-          >
-            Next: Configure &amp; Solve
-          </button>
-        )}
-      </div>
-
-      {/* Step 2: Config + Solve */}
-      {(step >= 2 || canSolve) && (
-        <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800/50">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="w-6 h-6 rounded-full bg-[var(--gold)] text-black text-xs font-bold flex items-center justify-center">2</span>
-            <h2 className="text-sm font-semibold">Configure &amp; Solve</h2>
-          </div>
-
-          {/* Quick config */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">Stack (bb)</label>
-              <input type="number" value={stackDepth} onChange={(e) => setStackDepth(Number(e.target.value))}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm" min={1} max={500} />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">Pot (bb)</label>
-              <input type="number" value={potSize} onChange={(e) => setPotSize(Number(e.target.value))}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm" min={1} />
-            </div>
-          </div>
-
-          {/* Ranges - collapsible */}
-          <button
-            onClick={() => setShowRanges(!showRanges)}
-            className="w-full flex items-center justify-between py-2 px-3 bg-gray-800/50 rounded-lg mb-2 text-sm"
-          >
-            <span className="text-gray-300">Player Ranges</span>
-            <span className="text-gray-500 text-xs">{showRanges ? 'Hide' : 'Show'}</span>
-          </button>
-
-          {showRanges && (
-            <div className="space-y-4 mb-4">
-              {/* OOP Range */}
-              <div className="bg-gray-800/30 rounded-lg p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold text-gray-400">OOP Range</span>
-                  <select value={oopPreset} onChange={(e) => handleRangePreset('oop', e.target.value)}
-                    className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs text-gray-300">
-                    {rangePresets.map(p => <option key={p} value={p}>{p.replace(/_/g, ' ')}</option>)}
-                  </select>
-                </div>
-                <RangeEditor grid={oopGrid} onChange={setOopGrid} />
-              </div>
-
-              {/* IP Range */}
-              <div className="bg-gray-800/30 rounded-lg p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold text-gray-400">IP Range</span>
-                  <select value={ipPreset} onChange={(e) => handleRangePreset('ip', e.target.value)}
-                    className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs text-gray-300">
-                    {rangePresets.map(p => <option key={p} value={p}>{p.replace(/_/g, ' ')}</option>)}
-                  </select>
-                </div>
-                <RangeEditor grid={ipGrid} onChange={setIpGrid} />
-              </div>
-            </div>
-          )}
-
-          {/* Advanced settings - collapsible */}
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="w-full flex items-center justify-between py-2 px-3 bg-gray-800/50 rounded-lg mb-4 text-sm"
-          >
-            <span className="text-gray-300">Advanced Settings</span>
-            <span className="text-gray-500 text-xs">{showSettings ? 'Hide' : 'Show'}</span>
-          </button>
-
-          {showSettings && (
-            <div className="space-y-3 mb-4 bg-gray-800/30 rounded-lg p-3">
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-[10px] text-gray-500 mb-0.5">Max Iterations</label>
-                  <input type="number" value={maxIterations} onChange={(e) => setMaxIterations(Number(e.target.value))}
-                    className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-xs" min={100} max={10000000} step={1000} />
-                </div>
-                <div>
-                  <label className="block text-[10px] text-gray-500 mb-0.5">Target Exploit. (bb)</label>
-                  <input type="number" value={targetExploitability} onChange={(e) => setTargetExploitability(Number(e.target.value))}
-                    className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-xs" min={0.001} max={10} step={0.1} />
-                </div>
-              </div>
-              {[
-                ['Flop Bets', flopBets, setFlopBets],
-                ['Turn Bets', turnBets, setTurnBets],
-                ['River Bets', riverBets, setRiverBets],
-                ['Flop Raises', flopRaises, setFlopRaises],
-                ['Turn Raises', turnRaises, setTurnRaises],
-                ['River Raises', riverRaises, setRiverRaises],
-              ].map(([label, val, setter]) => (
-                <div key={label as string}>
-                  <label className="block text-[10px] text-gray-500 mb-0.5">{label as string} (x pot)</label>
-                  <input value={val as string} onChange={(e) => (setter as (v: string) => void)(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-xs font-mono" />
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Solve button */}
-          <button
-            onClick={solver.running ? stopSolver : startSolver}
-            disabled={!canSolve && !solver.running}
-            className={`w-full py-3.5 rounded-xl text-base font-bold transition-all
-              ${solver.running
-                ? 'bg-red-600 active:bg-red-500 text-white'
-                : canSolve
-                  ? 'btn-gold text-lg'
-                  : 'bg-gray-800 text-gray-600 cursor-not-allowed'
+            key={p.label}
+            type="button"
+            onClick={() => onChange(p.bb)}
+            onTouchEnd={(e) => { e.preventDefault(); onChange(p.bb); }}
+            className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all touch-manipulation
+              ${Math.abs(value - p.bb) < 0.01
+                ? 'bg-[var(--gold)] text-black'
+                : 'bg-gray-800 text-gray-400 active:bg-gray-700'
               }`}
           >
-            {solver.running ? 'Stop Solver' : canSolve ? 'SOLVE' : `Select ${requiredCards} board cards first`}
+            <div>{p.label}</div>
+            {p.bb > 0 && <div className="text-[10px] opacity-70">{p.bb}bb</div>}
           </button>
+        ))}
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-gray-500">Custom:</span>
+        <input
+          type="number"
+          value={value || ''}
+          onChange={(e) => onChange(Number(e.target.value) || 0)}
+          className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm"
+          placeholder="0"
+          min={0}
+          step={0.5}
+        />
+        <span className="text-xs text-gray-500">bb</span>
+      </div>
+    </div>
+  );
+}
 
-          {/* Progress */}
-          {(solver.running || solver.iteration > 0) && (
-            <div className="mt-3">
-              <SolverProgress
-                iteration={solver.iteration}
-                maxIterations={maxIterations}
-                exploitability={solver.exploitability}
-                targetExploitability={targetExploitability}
-                timeMs={solver.timeMs}
-                nodeCount={solver.nodeCount}
-              />
-            </div>
+// --- Main Component ---
+export default function HandAdvisor() {
+  const [step, setStep] = useState(1);
+
+  // Step 1: Hero cards
+  const [heroCards, setHeroCards] = useState<CardIndex[]>([]);
+
+  // Step 2: Table
+  const [numPlayers, setNumPlayers] = useState(6);
+  const [heroPos, setHeroPos] = useState('BTN');
+  const [villainPos, setVillainPos] = useState('CO');
+  const [openSize, setOpenSize] = useState(2.5);
+
+  // Board cards
+  const [flopCards, setFlopCards] = useState<CardIndex[]>([]);
+  const [turnCard, setTurnCard] = useState<CardIndex[]>([]);
+  const [riverCard, setRiverCard] = useState<CardIndex[]>([]);
+
+  // Pot tracking per street
+  const preflopPot = openSize * 2 + 1.5;
+  const [flopPot, setFlopPot] = useState(6.5);
+  const [turnPot, setTurnPot] = useState(6.5);
+  const [riverPot, setRiverPot] = useState(6.5);
+
+  // Villain bets
+  const [flopBet, setFlopBet] = useState(0);
+  const [turnBet, setTurnBet] = useState(0);
+  const [riverBet, setRiverBet] = useState(0);
+
+  // Equity results
+  const [preflopEq, setPreflopEq] = useState<EqResult | null>(null);
+  const [flopEq, setFlopEq] = useState<EqResult | null>(null);
+  const [turnEq, setTurnEq] = useState<EqResult | null>(null);
+  const [riverEq, setRiverEq] = useState<EqResult | null>(null);
+  const [calculating, setCalculating] = useState(false);
+
+  const villainRange = useMemo(() => getVillainRange(villainPos), [villainPos]);
+
+  const calcEquity = useCallback(async (board: CardIndex[]): Promise<EqResult | null> => {
+    if (heroCards.length < 2) return null;
+    setCalculating(true);
+    await new Promise(r => setTimeout(r, 10));
+    try {
+      return calculateEquityVsRange(
+        [heroCards[0], heroCards[1]] as [CardIndex, CardIndex],
+        villainRange, board, 25000,
+      );
+    } catch { return null; }
+    finally { setCalculating(false); }
+  }, [heroCards, villainRange]);
+
+  // --- Step Transitions ---
+  const toStep2 = () => { if (heroCards.length >= 2) setStep(2); };
+
+  const toFlop = async () => {
+    const eq = await calcEquity([]);
+    setPreflopEq(eq);
+    setFlopPot(Math.round(preflopPot * 10) / 10);
+    setFlopBet(0);
+    setStep(3);
+  };
+
+  const toTurn = async () => {
+    if (flopCards.length < 3) return;
+    const eq = await calcEquity(flopCards);
+    setFlopEq(eq);
+    const newPot = flopBet > 0 ? flopPot + flopBet * 2 : flopPot;
+    setTurnPot(Math.round(newPot * 10) / 10);
+    setTurnBet(0);
+    setStep(4);
+  };
+
+  const toRiver = async () => {
+    if (turnCard.length < 1) return;
+    const eq = await calcEquity([...flopCards, ...turnCard]);
+    setTurnEq(eq);
+    const newPot = turnBet > 0 ? turnPot + turnBet * 2 : turnPot;
+    setRiverPot(Math.round(newPot * 10) / 10);
+    setRiverBet(0);
+    setStep(5);
+  };
+
+  const toResults = async () => {
+    if (riverCard.length < 1) return;
+    const eq = await calcEquity([...flopCards, ...turnCard, ...riverCard]);
+    setRiverEq(eq);
+    setStep(6);
+  };
+
+  const newHand = () => {
+    setStep(1);
+    setHeroCards([]);
+    setFlopCards([]); setTurnCard([]); setRiverCard([]);
+    setPreflopEq(null); setFlopEq(null); setTurnEq(null); setRiverEq(null);
+    setFlopBet(0); setTurnBet(0); setRiverBet(0);
+    setCalculating(false);
+  };
+
+  const goBack = (target: number) => {
+    if (target >= step) return;
+    setStep(target);
+    if (target <= 2) { setPreflopEq(null); setFlopEq(null); setTurnEq(null); setRiverEq(null); }
+    else if (target <= 3) { setFlopEq(null); setTurnEq(null); setRiverEq(null); }
+    else if (target <= 4) { setTurnEq(null); setRiverEq(null); }
+    else { setRiverEq(null); }
+  };
+
+  // --- Progress Bar ---
+  const steps = ['Cards', 'Table', 'Flop', 'Turn', 'River'];
+
+  return (
+    <div className="space-y-3">
+      {/* Progress dots */}
+      <div className="flex items-center justify-between px-1">
+        {steps.map((label, i) => {
+          const n = i + 1;
+          const active = step === n || (step === 6 && n === 5);
+          const done = step > n;
+          return (
+            <React.Fragment key={label}>
+              <button
+                type="button"
+                onClick={() => done && goBack(n)}
+                onTouchEnd={(e) => { if (done) { e.preventDefault(); goBack(n); } }}
+                className={`flex flex-col items-center gap-0.5 touch-manipulation ${done ? 'cursor-pointer' : 'cursor-default'}`}
+              >
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all
+                  ${active ? 'bg-[var(--gold)] text-black scale-110' : done ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-600'}`}>
+                  {done ? '\u2713' : n}
+                </div>
+                <span className={`text-[10px] font-medium ${active ? 'text-[var(--gold)]' : done ? 'text-green-400' : 'text-gray-600'}`}>{label}</span>
+              </button>
+              {i < steps.length - 1 && (
+                <div className={`flex-1 h-0.5 mx-1 rounded ${step > n ? 'bg-green-600' : 'bg-gray-800'}`} />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+
+      {/* Hero hand + board always visible when past step 1 */}
+      {heroCards.length === 2 && step > 1 && (
+        <div className="flex items-center justify-center gap-3 py-1">
+          <HeroMini cards={heroCards} />
+          {flopCards.length > 0 && (
+            <>
+              <span className="text-gray-600">|</span>
+              <BoardMini cards={[...flopCards, ...turnCard, ...riverCard]} />
+            </>
           )}
         </div>
       )}
 
-      {/* Step 3: Results */}
-      {solver.results && (
+      {/* ==================== STEP 1: YOUR CARDS ==================== */}
+      {step === 1 && (
         <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800/50">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="w-6 h-6 rounded-full bg-green-600 text-white text-xs font-bold flex items-center justify-center">3</span>
-            <h2 className="text-sm font-semibold">GTO Strategy</h2>
+          <h2 className="text-xl font-bold text-center mb-1">What are your cards?</h2>
+          <p className="text-sm text-gray-500 text-center mb-4">Tap your 2 hole cards</p>
+
+          <div className="felt-bg rounded-xl p-3">
+            <BoardSelector
+              selectedCards={heroCards}
+              onCardsChange={(c) => setHeroCards(c.slice(0, 2))}
+              maxCards={2}
+              label="Your hole cards"
+            />
           </div>
 
-          <div className="mb-4">
-            <h3 className="text-xs text-gray-500 mb-2 uppercase">Action Frequencies</h3>
-            <ActionBreakdown actions={solver.results.actions.map((action, i) => ({
-              action, frequency: solver.results!.overallFrequencies[i] || 0, ev: 0,
-            }))} />
-          </div>
-
-          <StrategyDisplay
-            strategy={solverResultsToStrategy(solver.results.handStrategies, solver.results.actions)}
-            actions={solver.results.actions}
-            title="Per-Hand Strategy"
-          />
+          <button
+            type="button"
+            onClick={toStep2}
+            onTouchEnd={(e) => { e.preventDefault(); toStep2(); }}
+            disabled={heroCards.length < 2}
+            className={`w-full mt-4 py-4 rounded-xl text-lg font-bold transition-all touch-manipulation
+              ${heroCards.length >= 2 ? 'btn-gold' : 'bg-gray-800 text-gray-600 cursor-not-allowed'}`}
+          >
+            {heroCards.length >= 2 ? 'NEXT' : 'Pick 2 cards'}
+          </button>
         </div>
       )}
 
-      {/* GTO Quick Calculator */}
-      <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800/50">
-        <h2 className="text-sm font-semibold mb-3">
-          <span className="text-[var(--gold)]">GTO</span> Quick Math
-        </h2>
-        <div className="grid grid-cols-2 gap-3 mb-3">
+      {/* ==================== STEP 2: TABLE SETUP ==================== */}
+      {step === 2 && (
+        <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800/50 space-y-5">
+          <h2 className="text-xl font-bold text-center">Table Setup</h2>
+
+          {/* Player count */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Pot (bb)</label>
-            <input type="number" value={potSize} onChange={(e) => setPotSize(Number(e.target.value))}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm" min={0} step={0.5} />
+            <div className="text-sm font-semibold text-gray-300 mb-2">How many players at the table?</div>
+            <div className="flex gap-2 flex-wrap">
+              {[2, 3, 4, 5, 6, 7, 8, 9].map(n => (
+                <button key={n} type="button"
+                  onClick={() => setNumPlayers(n)}
+                  onTouchEnd={(e) => { e.preventDefault(); setNumPlayers(n); }}
+                  className={`w-12 h-12 rounded-xl text-lg font-bold transition-all touch-manipulation
+                    ${numPlayers === n ? 'bg-[var(--gold)] text-black' : 'bg-gray-800 text-gray-400 active:bg-gray-700'}`}
+                >{n}</button>
+              ))}
+            </div>
           </div>
+
+          {/* Your position */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Bet (bb)</label>
-            <input type="number" value={betAmount} onChange={(e) => setBetAmount(Number(e.target.value))}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm" min={0} step={0.5} />
+            <div className="text-sm font-semibold text-gray-300 mb-2">Your position?</div>
+            <div className="grid grid-cols-6 gap-2">
+              {POSITIONS.map(pos => (
+                <button key={pos} type="button"
+                  onClick={() => setHeroPos(pos)}
+                  onTouchEnd={(e) => { e.preventDefault(); setHeroPos(pos); }}
+                  className={`py-3 rounded-xl text-sm font-bold transition-all touch-manipulation
+                    ${heroPos === pos ? 'bg-[var(--gold)] text-black' : 'bg-gray-800 text-gray-400 active:bg-gray-700'}`}
+                >{pos}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Who raised */}
+          <div>
+            <div className="text-sm font-semibold text-gray-300 mb-2">Who raised pre-flop?</div>
+            <div className="grid grid-cols-5 gap-2">
+              {POSITIONS.filter(p => p !== heroPos).map(pos => (
+                <button key={pos} type="button"
+                  onClick={() => setVillainPos(pos)}
+                  onTouchEnd={(e) => { e.preventDefault(); setVillainPos(pos); }}
+                  className={`py-3 rounded-xl text-sm font-bold transition-all touch-manipulation
+                    ${villainPos === pos ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 active:bg-gray-700'}`}
+                >{pos}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Raise size */}
+          <div>
+            <div className="text-sm font-semibold text-gray-300 mb-2">Raise size?</div>
+            <div className="flex gap-2">
+              {OPEN_SIZES.map(s => (
+                <button key={s} type="button"
+                  onClick={() => setOpenSize(s)}
+                  onTouchEnd={(e) => { e.preventDefault(); setOpenSize(s); }}
+                  className={`flex-1 py-3 rounded-xl text-base font-bold transition-all touch-manipulation
+                    ${openSize === s ? 'bg-[var(--gold)] text-black' : 'bg-gray-800 text-gray-400 active:bg-gray-700'}`}
+                >{s}x</button>
+              ))}
+            </div>
+          </div>
+
+          <button type="button"
+            onClick={toFlop}
+            onTouchEnd={(e) => { e.preventDefault(); toFlop(); }}
+            disabled={calculating}
+            className="w-full py-4 rounded-xl text-lg font-bold btn-gold touch-manipulation"
+          >
+            {calculating ? 'Calculating...' : 'DEAL THE FLOP'}
+          </button>
+        </div>
+      )}
+
+      {/* ===== Preflop Equity (visible step 3+) ===== */}
+      {step >= 3 && preflopEq && (
+        <div className="bg-gray-900/50 rounded-xl p-3 border border-gray-800/50">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-gray-500">Pre-flop vs {villainPos} ({(preflopEq.equity * 100).toFixed(0)}% equity)</span>
+            <span className="text-sm font-mono font-bold text-[var(--gold)]">Pot: {flopPot}bb</span>
+          </div>
+          <EquityBar equity={preflopEq.equity} height={16} />
+        </div>
+      )}
+
+      {/* ==================== STEP 3: FLOP ==================== */}
+      {step === 3 && (
+        <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800/50 space-y-4">
+          <h2 className="text-xl font-bold text-center">The Flop</h2>
+
+          <div className="felt-bg rounded-xl p-3">
+            <BoardSelector
+              selectedCards={flopCards}
+              onCardsChange={(c) => setFlopCards(c.slice(0, 3))}
+              maxCards={3}
+              deadCards={heroCards}
+              label="Pick the 3 flop cards"
+            />
+          </div>
+
+          {flopCards.length === 3 && (
+            <>
+              <BetButtons pot={flopPot} value={flopBet} onChange={setFlopBet} />
+
+              <button type="button"
+                onClick={toTurn}
+                onTouchEnd={(e) => { e.preventDefault(); toTurn(); }}
+                disabled={calculating}
+                className="w-full py-4 rounded-xl text-lg font-bold btn-gold touch-manipulation"
+              >
+                {calculating ? 'Calculating...' : 'GET ADVICE \u2192 TURN'}
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ===== Flop Advice (visible step 4+) ===== */}
+      {step >= 4 && flopEq && (
+        <div className="space-y-2">
+          <AdviceBanner advice={getAdvice(flopEq.equity, flopPot, flopBet)} label="Flop Advice" />
+          <div className="bg-gray-900/50 rounded-xl p-3 border border-gray-800/50">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500">Flop:</span>
+                <BoardMini cards={flopCards} />
+              </div>
+              <span className="text-sm font-mono text-gray-400">{(flopEq.equity * 100).toFixed(1)}%</span>
+            </div>
+            <EquityBar equity={flopEq.equity} height={16} />
           </div>
         </div>
-        <PotOddsDisplay potSize={potSize} betSize={betAmount} callAmount={betAmount} />
-      </div>
+      )}
+
+      {/* ==================== STEP 4: TURN ==================== */}
+      {step === 4 && (
+        <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800/50 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">The Turn</h2>
+            <span className="text-sm font-mono text-[var(--gold)]">Pot: {turnPot}bb</span>
+          </div>
+
+          <div className="felt-bg rounded-xl p-3">
+            <BoardSelector
+              selectedCards={turnCard}
+              onCardsChange={(c) => setTurnCard(c.slice(0, 1))}
+              maxCards={1}
+              deadCards={[...heroCards, ...flopCards]}
+              label="Pick the turn card"
+            />
+          </div>
+
+          {turnCard.length === 1 && (
+            <>
+              <BetButtons pot={turnPot} value={turnBet} onChange={setTurnBet} />
+
+              <button type="button"
+                onClick={toRiver}
+                onTouchEnd={(e) => { e.preventDefault(); toRiver(); }}
+                disabled={calculating}
+                className="w-full py-4 rounded-xl text-lg font-bold btn-gold touch-manipulation"
+              >
+                {calculating ? 'Calculating...' : 'GET ADVICE \u2192 RIVER'}
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ===== Turn Advice (visible step 5+) ===== */}
+      {step >= 5 && turnEq && (
+        <div className="space-y-2">
+          <AdviceBanner advice={getAdvice(turnEq.equity, turnPot, turnBet)} label="Turn Advice" />
+          <div className="bg-gray-900/50 rounded-xl p-3 border border-gray-800/50">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500">Turn:</span>
+                <BoardMini cards={[...flopCards, ...turnCard]} />
+              </div>
+              <span className="text-sm font-mono text-gray-400">{(turnEq.equity * 100).toFixed(1)}%</span>
+            </div>
+            <EquityBar equity={turnEq.equity} height={16} />
+          </div>
+        </div>
+      )}
+
+      {/* ==================== STEP 5: RIVER ==================== */}
+      {step === 5 && (
+        <div className="bg-gray-900/50 rounded-xl p-4 border border-gray-800/50 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">The River</h2>
+            <span className="text-sm font-mono text-[var(--gold)]">Pot: {riverPot}bb</span>
+          </div>
+
+          <div className="felt-bg rounded-xl p-3">
+            <BoardSelector
+              selectedCards={riverCard}
+              onCardsChange={(c) => setRiverCard(c.slice(0, 1))}
+              maxCards={1}
+              deadCards={[...heroCards, ...flopCards, ...turnCard]}
+              label="Pick the river card"
+            />
+          </div>
+
+          {riverCard.length === 1 && (
+            <>
+              <BetButtons pot={riverPot} value={riverBet} onChange={setRiverBet} />
+
+              <button type="button"
+                onClick={toResults}
+                onTouchEnd={(e) => { e.preventDefault(); toResults(); }}
+                disabled={calculating}
+                className="w-full py-4 rounded-xl text-lg font-bold btn-gold touch-manipulation"
+              >
+                {calculating ? 'Calculating...' : 'GET FINAL ADVICE'}
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ===== River Advice (step 6) ===== */}
+      {step === 6 && riverEq && (
+        <div className="space-y-2">
+          <AdviceBanner advice={getAdvice(riverEq.equity, riverPot, riverBet)} label="River Advice" />
+          <div className="bg-gray-900/50 rounded-xl p-3 border border-gray-800/50">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500">Board:</span>
+                <BoardMini cards={[...flopCards, ...turnCard, ...riverCard]} />
+              </div>
+              <span className="text-sm font-mono text-gray-400">{(riverEq.equity * 100).toFixed(1)}%</span>
+            </div>
+            <EquityBar equity={riverEq.equity} height={16} />
+          </div>
+        </div>
+      )}
+
+      {/* ===== New Hand button ===== */}
+      {step >= 3 && (
+        <button type="button"
+          onClick={newHand}
+          onTouchEnd={(e) => { e.preventDefault(); newHand(); }}
+          className="w-full py-3.5 rounded-xl text-base font-semibold bg-gray-800 text-gray-300 active:bg-gray-700 border border-gray-700 touch-manipulation"
+        >
+          NEW HAND
+        </button>
+      )}
     </div>
   );
 }
