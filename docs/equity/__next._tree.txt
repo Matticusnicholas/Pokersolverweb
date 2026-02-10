@@ -1,2 +1,2 @@
-:HL["/_next/static/chunks/02503ee35f539c9e.css","style"]
-0:{"buildId":"Fb55A03McU_zq0hwnJFBr","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"equity","paramType":null,"paramKey":"equity","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}
+:HL["/Pokersolverweb/_next/static/chunks/4f7cf4f70df8ef7c.css","style"]
+0:{"buildId":"AP9jnKPdq3mq_eX6R5gWp","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"equity","paramType":null,"paramKey":"equity","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}

@@ -1,9 +1,9 @@
 1:"$Sreact.fragment"
-2:I[47257,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/d2be314c3ece3fbe.js"],"ClientPageRoot"]
-3:I[60551,["/_next/static/chunks/a2dc3ddb4e42dcae.js","/_next/static/chunks/a7169a67e9fe5d20.js"],"default"]
-6:I[97367,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/d2be314c3ece3fbe.js"],"OutletBoundary"]
+2:I[47257,["/Pokersolverweb/_next/static/chunks/ff1a16fafef87110.js","/Pokersolverweb/_next/static/chunks/d2be314c3ece3fbe.js"],"ClientPageRoot"]
+3:I[60551,["/Pokersolverweb/_next/static/chunks/db257b617e3d15b5.js","/Pokersolverweb/_next/static/chunks/4e287ff45f43b4f2.js"],"default"]
+6:I[97367,["/Pokersolverweb/_next/static/chunks/ff1a16fafef87110.js","/Pokersolverweb/_next/static/chunks/d2be314c3ece3fbe.js"],"OutletBoundary"]
 7:"$Sreact.suspense"
-0:{"buildId":"Fb55A03McU_zq0hwnJFBr","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/_next/static/chunks/a7169a67e9fe5d20.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
+0:{"buildId":"AP9jnKPdq3mq_eX6R5gWp","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/Pokersolverweb/_next/static/chunks/4e287ff45f43b4f2.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
 4:{}
 5:"$0:rsc:props:children:0:props:serverProvidedParams:params"
 8:null
