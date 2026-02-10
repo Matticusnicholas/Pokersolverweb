@@ -1,11 +1,8 @@
 'use client';
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useState, useCallback, useEffect } from 'react';
 import { CardIndex, Suit, indexToCard } from '@/engine/types';
-
-// Lazy-load heavy engine modules to avoid blocking hydration
-const BoardSelector = dynamic(() => import('@/components/BoardSelector'), { ssr: true });
+import BoardSelector from '@/components/BoardSelector';
 
 let _eqModule: typeof import('@/engine/equity') | null = null;
 let _rangeModule: typeof import('@/engine/ranges') | null = null;
