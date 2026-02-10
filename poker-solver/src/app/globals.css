@@ -54,11 +54,18 @@ body {
   background: radial-gradient(ellipse at center, #1e7d45 0%, #145230 60%, #0d3a22 100%);
 }
 
-/* Suit colors */
+/* Suit colors - standard poker: spades/clubs black, hearts/diamonds red */
 .suit-spade { color: #1a1a2e; }
 .suit-heart { color: #dc2626; }
-.suit-diamond { color: #2563eb; }
-.suit-club { color: #15803d; }
+.suit-diamond { color: #dc2626; }
+.suit-club { color: #1a1a2e; }
+
+/* Card selected state - bright yellow background */
+.card-selected {
+  background: #facc15 !important;
+  box-shadow: 0 0 12px rgba(250, 204, 21, 0.5);
+  border: 2px solid #eab308;
+}
 
 /* Gold button */
 .btn-gold {

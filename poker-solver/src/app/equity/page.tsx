@@ -9,7 +9,7 @@ import { calculateEquityVsRange } from '@/engine/equity';
 import { parseRange, rangeToGrid, gridToRange, DEFAULT_RANGES } from '@/engine/ranges';
 
 const SUIT_SYMBOLS: Record<Suit, string> = { s: '\u2660', h: '\u2665', d: '\u2666', c: '\u2663' };
-const SUIT_COLORS: Record<Suit, string> = { s: 'text-gray-200', h: 'text-red-400', d: 'text-blue-400', c: 'text-green-400' };
+const SUIT_COLORS: Record<Suit, string> = { s: 'text-gray-200', h: 'text-red-400', d: 'text-red-400', c: 'text-gray-200' };
 
 interface EquityResult {
   equity: number;

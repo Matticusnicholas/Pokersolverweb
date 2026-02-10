@@ -1,215 +1,215 @@
-<!DOCTYPE html><!--lOR56deBNmjeztrhrdR8M--><html lang="en" class="dark"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="/_next/static/chunks/8b6c34f86128f082.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/05be8470af537e1f.js"/><script src="/_next/static/chunks/f2f58a7e93290fbb.js" async=""></script><script src="/_next/static/chunks/0d1bcf8db95909b4.js" async=""></script><script src="/_next/static/chunks/turbopack-1418416b5a9a1600.js" async=""></script><script src="/_next/static/chunks/26ea2c451187d175.js" async=""></script><script src="/_next/static/chunks/ff1a16fafef87110.js" async=""></script><script src="/_next/static/chunks/d2be314c3ece3fbe.js" async=""></script><script src="/_next/static/chunks/5eac11194c21dd30.js" async=""></script><title>Poker GTO Solver</title><meta name="description" content="Game Theory Optimal poker solver with GPU acceleration"/><link rel="icon" href="/favicon.ico?favicon.0b3bf435.ico" sizes="256x256" type="image/x-icon"/><script src="/_next/static/chunks/a6dad97d9634a72d.js" noModule=""></script></head><body class="antialiased bg-[var(--background)] text-[var(--foreground)] min-h-screen font-sans"><div hidden=""><!--$--><!--/$--></div><nav class="fixed bottom-0 left-0 right-0 z-50 bg-[#0a1218] border-t border-gray-800 safe-area-bottom md:relative md:bottom-auto md:border-t-0 md:border-b"><div class="max-w-lg mx-auto flex items-center justify-around h-16 md:h-14 px-2"><a class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-colors min-w-[72px]
+<!DOCTYPE html><!--ANX67iNxunoi9mTgZPeNT--><html lang="en" class="dark"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="/_next/static/chunks/a898ba6014aab920.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/05be8470af537e1f.js"/><script src="/_next/static/chunks/f2f58a7e93290fbb.js" async=""></script><script src="/_next/static/chunks/0d1bcf8db95909b4.js" async=""></script><script src="/_next/static/chunks/turbopack-1418416b5a9a1600.js" async=""></script><script src="/_next/static/chunks/26ea2c451187d175.js" async=""></script><script src="/_next/static/chunks/ff1a16fafef87110.js" async=""></script><script src="/_next/static/chunks/d2be314c3ece3fbe.js" async=""></script><script src="/_next/static/chunks/44020607d5b37d76.js" async=""></script><title>Poker GTO Solver</title><meta name="description" content="Game Theory Optimal poker solver with GPU acceleration"/><link rel="icon" href="/favicon.ico?favicon.0b3bf435.ico" sizes="256x256" type="image/x-icon"/><script src="/_next/static/chunks/a6dad97d9634a72d.js" noModule=""></script></head><body class="antialiased bg-[var(--background)] text-[var(--foreground)] min-h-screen font-sans"><div hidden=""><!--$--><!--/$--></div><nav class="fixed bottom-0 left-0 right-0 z-50 bg-[#0a1218] border-t border-gray-800 safe-area-bottom md:relative md:bottom-auto md:border-t-0 md:border-b"><div class="max-w-lg mx-auto flex items-center justify-around h-16 md:h-14 px-2"><a class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-colors min-w-[72px]
                 text-[#d4a84b]" href="/"><span class="text-2xl leading-none">♠</span><span class="text-[10px] font-semibold tracking-wide uppercase">Solver</span></a><a class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-colors min-w-[72px]
                 text-gray-500 active:text-gray-300" href="/preflop/"><span class="text-2xl leading-none">♥</span><span class="text-[10px] font-semibold tracking-wide uppercase">Preflop</span></a><a class="flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-colors min-w-[72px]
                 text-gray-500 active:text-gray-300" href="/equity/"><span class="text-2xl leading-none">♦</span><span class="text-[10px] font-semibold tracking-wide uppercase">Equity</span></a></div></nav><main class="max-w-lg mx-auto px-3 pt-4 pb-24 md:pb-6 md:pt-4 md:max-w-6xl"><div class="space-y-4"><div class="text-center"><h1 class="text-xl font-bold"><span class="text-[var(--gold)]">GTO</span> Solver</h1><p class="text-xs text-gray-500 mt-0.5">Pick cards, set ranges, find the optimal play</p></div><div class="bg-gray-900/50 rounded-xl p-4 border border-gray-800/50"><div class="flex items-center gap-2 mb-3"><span class="w-6 h-6 rounded-full bg-[var(--gold)] text-black text-xs font-bold flex items-center justify-center">1</span><h2 class="text-sm font-semibold">Choose the Board</h2></div><div class="flex gap-2 mb-4"><button class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all
                 bg-[var(--gold)] text-black">Flop</button><button class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all
                 bg-gray-800 text-gray-400 active:bg-gray-700">Turn</button><button class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all
-                bg-gray-800 text-gray-400 active:bg-gray-700">River</button></div><div class="felt-bg rounded-xl p-4"><div><div class="flex items-center justify-between mb-2"><span class="text-sm font-semibold text-gray-300">Pick 3 board cards</span><div class="flex items-center gap-2"><span class="text-xs text-gray-500">0<!-- -->/<!-- -->3</span></div></div><div class="flex gap-2 mb-3 justify-center min-h-[80px] items-center"><div class="w-14 h-20 rounded-lg border-2 border-dashed border-gray-700 flex items-center justify-center"><span class="text-gray-700 text-2xl">?</span></div><div class="w-14 h-20 rounded-lg border-2 border-dashed border-gray-700 flex items-center justify-center"><span class="text-gray-700 text-2xl">?</span></div><div class="w-14 h-20 rounded-lg border-2 border-dashed border-gray-700 flex items-center justify-center"><span class="text-gray-700 text-2xl">?</span></div></div><div class="overflow-x-auto -mx-1 px-1"><div class="grid gap-[3px]" style="grid-template-columns:repeat(13, 1fr);min-width:320px"><button class="
+                bg-gray-800 text-gray-400 active:bg-gray-700">River</button></div><div class="felt-bg rounded-xl p-4"><div><div class="flex items-center justify-between mb-2"><span class="text-sm font-semibold text-gray-300">Pick 3 board cards</span><div class="flex items-center gap-2"><span class="text-xs text-gray-500">0<!-- -->/<!-- -->3</span></div></div><div class="flex gap-2 mb-3 justify-center min-h-[80px] items-center flex-wrap"><div class="w-14 h-20 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center bg-gray-800/50"><span class="text-gray-600 text-2xl">?</span></div><div class="w-14 h-20 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center bg-gray-800/50"><span class="text-gray-600 text-2xl">?</span></div><div class="w-14 h-20 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center bg-gray-800/50"><span class="text-gray-600 text-2xl">?</span></div></div><div class="w-full"><div class="grid gap-[3px] w-full" style="grid-template-columns:repeat(13, 1fr)"><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-gray-900">A</span><span class="text-[10px] sm:text-xs leading-none text-gray-900">♠</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">A</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♠</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-gray-900">K</span><span class="text-[10px] sm:text-xs leading-none text-gray-900">♠</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">K</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♠</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-gray-900">Q</span><span class="text-[10px] sm:text-xs leading-none text-gray-900">♠</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">Q</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♠</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-gray-900">J</span><span class="text-[10px] sm:text-xs leading-none text-gray-900">♠</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">J</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♠</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-gray-900">T</span><span class="text-[10px] sm:text-xs leading-none text-gray-900">♠</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">T</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♠</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-gray-900">9</span><span class="text-[10px] sm:text-xs leading-none text-gray-900">♠</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">9</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♠</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-gray-900">8</span><span class="text-[10px] sm:text-xs leading-none text-gray-900">♠</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">8</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♠</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-gray-900">7</span><span class="text-[10px] sm:text-xs leading-none text-gray-900">♠</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">7</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♠</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-gray-900">6</span><span class="text-[10px] sm:text-xs leading-none text-gray-900">♠</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">6</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♠</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-gray-900">5</span><span class="text-[10px] sm:text-xs leading-none text-gray-900">♠</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">5</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♠</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-gray-900">4</span><span class="text-[10px] sm:text-xs leading-none text-gray-900">♠</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">4</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♠</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-gray-900">3</span><span class="text-[10px] sm:text-xs leading-none text-gray-900">♠</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">3</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♠</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-gray-900">2</span><span class="text-[10px] sm:text-xs leading-none text-gray-900">♠</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">2</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♠</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-red-600">A</span><span class="text-[10px] sm:text-xs leading-none text-red-600">♥</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-600">A</span><span class="text-[9px] sm:text-xs leading-none text-red-600">♥</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-red-600">K</span><span class="text-[10px] sm:text-xs leading-none text-red-600">♥</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-600">K</span><span class="text-[9px] sm:text-xs leading-none text-red-600">♥</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-red-600">Q</span><span class="text-[10px] sm:text-xs leading-none text-red-600">♥</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-600">Q</span><span class="text-[9px] sm:text-xs leading-none text-red-600">♥</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-red-600">J</span><span class="text-[10px] sm:text-xs leading-none text-red-600">♥</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-600">J</span><span class="text-[9px] sm:text-xs leading-none text-red-600">♥</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-red-600">T</span><span class="text-[10px] sm:text-xs leading-none text-red-600">♥</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-600">T</span><span class="text-[9px] sm:text-xs leading-none text-red-600">♥</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-red-600">9</span><span class="text-[10px] sm:text-xs leading-none text-red-600">♥</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-600">9</span><span class="text-[9px] sm:text-xs leading-none text-red-600">♥</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-red-600">8</span><span class="text-[10px] sm:text-xs leading-none text-red-600">♥</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-600">8</span><span class="text-[9px] sm:text-xs leading-none text-red-600">♥</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-red-600">7</span><span class="text-[10px] sm:text-xs leading-none text-red-600">♥</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-600">7</span><span class="text-[9px] sm:text-xs leading-none text-red-600">♥</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-red-600">6</span><span class="text-[10px] sm:text-xs leading-none text-red-600">♥</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-600">6</span><span class="text-[9px] sm:text-xs leading-none text-red-600">♥</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-red-600">5</span><span class="text-[10px] sm:text-xs leading-none text-red-600">♥</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-600">5</span><span class="text-[9px] sm:text-xs leading-none text-red-600">♥</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-red-600">4</span><span class="text-[10px] sm:text-xs leading-none text-red-600">♥</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-600">4</span><span class="text-[9px] sm:text-xs leading-none text-red-600">♥</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-red-600">3</span><span class="text-[10px] sm:text-xs leading-none text-red-600">♥</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-600">3</span><span class="text-[9px] sm:text-xs leading-none text-red-600">♥</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-red-600">2</span><span class="text-[10px] sm:text-xs leading-none text-red-600">♥</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-600">2</span><span class="text-[9px] sm:text-xs leading-none text-red-600">♥</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-blue-600">A</span><span class="text-[10px] sm:text-xs leading-none text-blue-600">♦</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-500">A</span><span class="text-[9px] sm:text-xs leading-none text-red-500">♦</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-blue-600">K</span><span class="text-[10px] sm:text-xs leading-none text-blue-600">♦</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-500">K</span><span class="text-[9px] sm:text-xs leading-none text-red-500">♦</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-blue-600">Q</span><span class="text-[10px] sm:text-xs leading-none text-blue-600">♦</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-500">Q</span><span class="text-[9px] sm:text-xs leading-none text-red-500">♦</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-blue-600">J</span><span class="text-[10px] sm:text-xs leading-none text-blue-600">♦</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-500">J</span><span class="text-[9px] sm:text-xs leading-none text-red-500">♦</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-blue-600">T</span><span class="text-[10px] sm:text-xs leading-none text-blue-600">♦</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-500">T</span><span class="text-[9px] sm:text-xs leading-none text-red-500">♦</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-blue-600">9</span><span class="text-[10px] sm:text-xs leading-none text-blue-600">♦</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-500">9</span><span class="text-[9px] sm:text-xs leading-none text-red-500">♦</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-blue-600">8</span><span class="text-[10px] sm:text-xs leading-none text-blue-600">♦</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-500">8</span><span class="text-[9px] sm:text-xs leading-none text-red-500">♦</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-blue-600">7</span><span class="text-[10px] sm:text-xs leading-none text-blue-600">♦</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-500">7</span><span class="text-[9px] sm:text-xs leading-none text-red-500">♦</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-blue-600">6</span><span class="text-[10px] sm:text-xs leading-none text-blue-600">♦</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-500">6</span><span class="text-[9px] sm:text-xs leading-none text-red-500">♦</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-blue-600">5</span><span class="text-[10px] sm:text-xs leading-none text-blue-600">♦</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-500">5</span><span class="text-[9px] sm:text-xs leading-none text-red-500">♦</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-blue-600">4</span><span class="text-[10px] sm:text-xs leading-none text-blue-600">♦</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-500">4</span><span class="text-[9px] sm:text-xs leading-none text-red-500">♦</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-blue-600">3</span><span class="text-[10px] sm:text-xs leading-none text-blue-600">♦</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-500">3</span><span class="text-[9px] sm:text-xs leading-none text-red-500">♦</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-blue-600">2</span><span class="text-[10px] sm:text-xs leading-none text-blue-600">♦</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-red-500">2</span><span class="text-[9px] sm:text-xs leading-none text-red-500">♦</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-green-700">A</span><span class="text-[10px] sm:text-xs leading-none text-green-700">♣</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">A</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♣</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-green-700">K</span><span class="text-[10px] sm:text-xs leading-none text-green-700">♣</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">K</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♣</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-green-700">Q</span><span class="text-[10px] sm:text-xs leading-none text-green-700">♣</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">Q</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♣</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-green-700">J</span><span class="text-[10px] sm:text-xs leading-none text-green-700">♣</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">J</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♣</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-green-700">T</span><span class="text-[10px] sm:text-xs leading-none text-green-700">♣</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">T</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♣</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-green-700">9</span><span class="text-[10px] sm:text-xs leading-none text-green-700">♣</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">9</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♣</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-green-700">8</span><span class="text-[10px] sm:text-xs leading-none text-green-700">♣</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">8</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♣</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-green-700">7</span><span class="text-[10px] sm:text-xs leading-none text-green-700">♣</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">7</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♣</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-green-700">6</span><span class="text-[10px] sm:text-xs leading-none text-green-700">♣</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">6</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♣</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-green-700">5</span><span class="text-[10px] sm:text-xs leading-none text-green-700">♣</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">5</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♣</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-green-700">4</span><span class="text-[10px] sm:text-xs leading-none text-green-700">♣</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">4</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♣</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-green-700">3</span><span class="text-[10px] sm:text-xs leading-none text-green-700">♣</span></button><button class="
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">3</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♣</span></button><button type="button" class="
                     aspect-[3/4] rounded-md flex flex-col items-center justify-center font-bold
-                    transition-all duration-100 min-w-0
-                    poker-card
-                  "><span class="text-xs sm:text-sm leading-none text-green-700">2</span><span class="text-[10px] sm:text-xs leading-none text-green-700">♣</span></button></div></div></div></div></div><div class="bg-gray-900/50 rounded-xl p-4 border border-gray-800/50"><h2 class="text-sm font-semibold mb-3"><span class="text-[var(--gold)]">GTO</span> Quick Math</h2><div class="grid grid-cols-2 gap-3 mb-3"><div><label class="block text-xs text-gray-500 mb-1">Pot (bb)</label><input type="number" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm" min="0" step="0.5" value="6"/></div><div><label class="block text-xs text-gray-500 mb-1">Bet (bb)</label><input type="number" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm" min="0" step="0.5" value="4"/></div></div><div class="space-y-3"><div class="grid grid-cols-2 gap-3"><div class="bg-gray-800/50 rounded-lg p-3"><div class="text-[10px] text-gray-500 uppercase mb-1">Pot Odds</div><div class="text-lg font-mono font-bold text-blue-400">40.0<!-- -->%</div><div class="text-[10px] text-gray-600">Need this equity to call</div></div><div class="bg-gray-800/50 rounded-lg p-3"><div class="text-[10px] text-gray-500 uppercase mb-1">MDF</div><div class="text-lg font-mono font-bold text-green-400">60.0<!-- -->%</div><div class="text-[10px] text-gray-600">Minimum defense</div></div><div class="bg-gray-800/50 rounded-lg p-3"><div class="text-[10px] text-gray-500 uppercase mb-1">Bluff Breakeven</div><div class="text-lg font-mono font-bold text-red-400">40.0<!-- -->%</div><div class="text-[10px] text-gray-600">Folds needed to bluff</div></div><div class="bg-gray-800/50 rounded-lg p-3"><div class="text-[10px] text-gray-500 uppercase mb-1">Value:Bluff</div><div class="text-lg font-mono font-bold text-amber-400">2.5<!-- -->:1</div><div class="text-[10px] text-gray-600">Balanced bet ratio</div></div></div></div></div></div><!--$--><!--/$--></main><script src="/_next/static/chunks/05be8470af537e1f.js" id="_R_" async=""></script><script>(self.__next_f=self.__next_f||[]).push([0])</script><script>self.__next_f.push([1,"1:\"$Sreact.fragment\"\n2:I[88589,[\"/_next/static/chunks/26ea2c451187d175.js\"],\"default\"]\n3:I[39756,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"default\"]\n4:I[37457,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"default\"]\n5:I[47257,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"ClientPageRoot\"]\n6:I[52683,[\"/_next/static/chunks/26ea2c451187d175.js\",\"/_next/static/chunks/5eac11194c21dd30.js\"],\"default\"]\n9:I[97367,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"OutletBoundary\"]\na:\"$Sreact.suspense\"\nc:I[97367,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"ViewportBoundary\"]\ne:I[97367,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"MetadataBoundary\"]\n10:I[68027,[],\"default\"]\n:HL[\"/_next/static/chunks/8b6c34f86128f082.css\",\"style\"]\n"])</script><script>self.__next_f.push([1,"0:{\"P\":null,\"b\":\"lOR56deBNmjeztrhrdR8M\",\"c\":[\"\",\"\"],\"q\":\"\",\"i\":false,\"f\":[[[\"\",{\"children\":[\"__PAGE__\",{}]},\"$undefined\",\"$undefined\",true],[[\"$\",\"$1\",\"c\",{\"children\":[[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/chunks/8b6c34f86128f082.css\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}],[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/26ea2c451187d175.js\",\"async\":true,\"nonce\":\"$undefined\"}]],[\"$\",\"html\",null,{\"lang\":\"en\",\"className\":\"dark\",\"children\":[[\"$\",\"head\",null,{\"children\":[\"$\",\"meta\",null,{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no\"}]}],[\"$\",\"body\",null,{\"className\":\"antialiased bg-[var(--background)] text-[var(--foreground)] min-h-screen font-sans\",\"children\":[[\"$\",\"$L2\",null,{}],[\"$\",\"main\",null,{\"className\":\"max-w-lg mx-auto px-3 pt-4 pb-24 md:pb-6 md:pt-4 md:max-w-6xl\",\"children\":[\"$\",\"$L3\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L4\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"}],[\"$\",\"div\",null,{\"style\":{\"fontFamily\":\"system-ui,\\\"Segoe UI\\\",Roboto,Helvetica,Arial,sans-serif,\\\"Apple Color Emoji\\\",\\\"Segoe UI Emoji\\\"\",\"height\":\"100vh\",\"textAlign\":\"center\",\"display\":\"flex\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}}],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":{\"display\":\"inline-block\",\"margin\":\"0 20px 0 0\",\"padding\":\"0 23px 0 0\",\"fontSize\":24,\"fontWeight\":500,\"verticalAlign\":\"top\",\"lineHeight\":\"49px\"},\"children\":404}],[\"$\",\"div\",null,{\"style\":{\"display\":\"inline-block\"},\"children\":[\"$\",\"h2\",null,{\"style\":{\"fontSize\":14,\"fontWeight\":400,\"lineHeight\":\"49px\",\"margin\":0},\"children\":\"This page could not be found.\"}]}]]}]}]],[]],\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\"}]}]]}]]}]]}],{\"children\":[[\"$\",\"$1\",\"c\",{\"children\":[[\"$\",\"$L5\",null,{\"Component\":\"$6\",\"serverProvidedParams\":{\"searchParams\":{},\"params\":{},\"promises\":[\"$@7\",\"$@8\"]}}],[[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/5eac11194c21dd30.js\",\"async\":true,\"nonce\":\"$undefined\"}]],[\"$\",\"$L9\",null,{\"children\":[\"$\",\"$a\",null,{\"name\":\"Next.MetadataOutlet\",\"children\":\"$@b\"}]}]]}],{},null,false,false]},null,false,false],[\"$\",\"$1\",\"h\",{\"children\":[null,[\"$\",\"$Lc\",null,{\"children\":\"$Ld\"}],[\"$\",\"div\",null,{\"hidden\":true,\"children\":[\"$\",\"$Le\",null,{\"children\":[\"$\",\"$a\",null,{\"name\":\"Next.Metadata\",\"children\":\"$Lf\"}]}]}],null]}],false]],\"m\":\"$undefined\",\"G\":[\"$10\",[]],\"S\":true}\n"])</script><script>self.__next_f.push([1,"7:{}\n8:\"$0:f:0:1:1:children:0:props:children:0:props:serverProvidedParams:params\"\n"])</script><script>self.__next_f.push([1,"d:[[\"$\",\"meta\",\"0\",{\"charSet\":\"utf-8\"}],[\"$\",\"meta\",\"1\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"}]]\n"])</script><script>self.__next_f.push([1,"11:I[27201,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"IconMark\"]\nb:null\nf:[[\"$\",\"title\",\"0\",{\"children\":\"Poker GTO Solver\"}],[\"$\",\"meta\",\"1\",{\"name\":\"description\",\"content\":\"Game Theory Optimal poker solver with GPU acceleration\"}],[\"$\",\"link\",\"2\",{\"rel\":\"icon\",\"href\":\"/favicon.ico?favicon.0b3bf435.ico\",\"sizes\":\"256x256\",\"type\":\"image/x-icon\"}],[\"$\",\"$L11\",\"3\",{}]]\n"])</script></body></html>
+                    min-w-0 min-h-[32px] touch-manipulation
+                    bg-[var(--card-white)] shadow-sm active:bg-gray-200 active:scale-95
+                  "><span class="text-[11px] sm:text-sm leading-none text-gray-900">2</span><span class="text-[9px] sm:text-xs leading-none text-gray-900">♣</span></button></div></div></div></div></div><div class="bg-gray-900/50 rounded-xl p-4 border border-gray-800/50"><h2 class="text-sm font-semibold mb-3"><span class="text-[var(--gold)]">GTO</span> Quick Math</h2><div class="grid grid-cols-2 gap-3 mb-3"><div><label class="block text-xs text-gray-500 mb-1">Pot (bb)</label><input type="number" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm" min="0" step="0.5" value="6"/></div><div><label class="block text-xs text-gray-500 mb-1">Bet (bb)</label><input type="number" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm" min="0" step="0.5" value="4"/></div></div><div class="space-y-3"><div class="grid grid-cols-2 gap-3"><div class="bg-gray-800/50 rounded-lg p-3"><div class="text-[10px] text-gray-500 uppercase mb-1">Pot Odds</div><div class="text-lg font-mono font-bold text-blue-400">40.0<!-- -->%</div><div class="text-[10px] text-gray-600">Need this equity to call</div></div><div class="bg-gray-800/50 rounded-lg p-3"><div class="text-[10px] text-gray-500 uppercase mb-1">MDF</div><div class="text-lg font-mono font-bold text-green-400">60.0<!-- -->%</div><div class="text-[10px] text-gray-600">Minimum defense</div></div><div class="bg-gray-800/50 rounded-lg p-3"><div class="text-[10px] text-gray-500 uppercase mb-1">Bluff Breakeven</div><div class="text-lg font-mono font-bold text-red-400">40.0<!-- -->%</div><div class="text-[10px] text-gray-600">Folds needed to bluff</div></div><div class="bg-gray-800/50 rounded-lg p-3"><div class="text-[10px] text-gray-500 uppercase mb-1">Value:Bluff</div><div class="text-lg font-mono font-bold text-amber-400">2.5<!-- -->:1</div><div class="text-[10px] text-gray-600">Balanced bet ratio</div></div></div></div></div></div><!--$--><!--/$--></main><script src="/_next/static/chunks/05be8470af537e1f.js" id="_R_" async=""></script><script>(self.__next_f=self.__next_f||[]).push([0])</script><script>self.__next_f.push([1,"1:\"$Sreact.fragment\"\n2:I[88589,[\"/_next/static/chunks/26ea2c451187d175.js\"],\"default\"]\n3:I[39756,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"default\"]\n4:I[37457,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"default\"]\n5:I[47257,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"ClientPageRoot\"]\n6:I[52683,[\"/_next/static/chunks/26ea2c451187d175.js\",\"/_next/static/chunks/44020607d5b37d76.js\"],\"default\"]\n9:I[97367,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"OutletBoundary\"]\na:\"$Sreact.suspense\"\nc:I[97367,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"ViewportBoundary\"]\ne:I[97367,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"MetadataBoundary\"]\n10:I[68027,[],\"default\"]\n:HL[\"/_next/static/chunks/a898ba6014aab920.css\",\"style\"]\n"])</script><script>self.__next_f.push([1,"0:{\"P\":null,\"b\":\"ANX67iNxunoi9mTgZPeNT\",\"c\":[\"\",\"\"],\"q\":\"\",\"i\":false,\"f\":[[[\"\",{\"children\":[\"__PAGE__\",{}]},\"$undefined\",\"$undefined\",true],[[\"$\",\"$1\",\"c\",{\"children\":[[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/chunks/a898ba6014aab920.css\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}],[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/26ea2c451187d175.js\",\"async\":true,\"nonce\":\"$undefined\"}]],[\"$\",\"html\",null,{\"lang\":\"en\",\"className\":\"dark\",\"children\":[[\"$\",\"head\",null,{\"children\":[\"$\",\"meta\",null,{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no\"}]}],[\"$\",\"body\",null,{\"className\":\"antialiased bg-[var(--background)] text-[var(--foreground)] min-h-screen font-sans\",\"children\":[[\"$\",\"$L2\",null,{}],[\"$\",\"main\",null,{\"className\":\"max-w-lg mx-auto px-3 pt-4 pb-24 md:pb-6 md:pt-4 md:max-w-6xl\",\"children\":[\"$\",\"$L3\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L4\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"}],[\"$\",\"div\",null,{\"style\":{\"fontFamily\":\"system-ui,\\\"Segoe UI\\\",Roboto,Helvetica,Arial,sans-serif,\\\"Apple Color Emoji\\\",\\\"Segoe UI Emoji\\\"\",\"height\":\"100vh\",\"textAlign\":\"center\",\"display\":\"flex\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}}],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":{\"display\":\"inline-block\",\"margin\":\"0 20px 0 0\",\"padding\":\"0 23px 0 0\",\"fontSize\":24,\"fontWeight\":500,\"verticalAlign\":\"top\",\"lineHeight\":\"49px\"},\"children\":404}],[\"$\",\"div\",null,{\"style\":{\"display\":\"inline-block\"},\"children\":[\"$\",\"h2\",null,{\"style\":{\"fontSize\":14,\"fontWeight\":400,\"lineHeight\":\"49px\",\"margin\":0},\"children\":\"This page could not be found.\"}]}]]}]}]],[]],\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\"}]}]]}]]}]]}],{\"children\":[[\"$\",\"$1\",\"c\",{\"children\":[[\"$\",\"$L5\",null,{\"Component\":\"$6\",\"serverProvidedParams\":{\"searchParams\":{},\"params\":{},\"promises\":[\"$@7\",\"$@8\"]}}],[[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/44020607d5b37d76.js\",\"async\":true,\"nonce\":\"$undefined\"}]],[\"$\",\"$L9\",null,{\"children\":[\"$\",\"$a\",null,{\"name\":\"Next.MetadataOutlet\",\"children\":\"$@b\"}]}]]}],{},null,false,false]},null,false,false],[\"$\",\"$1\",\"h\",{\"children\":[null,[\"$\",\"$Lc\",null,{\"children\":\"$Ld\"}],[\"$\",\"div\",null,{\"hidden\":true,\"children\":[\"$\",\"$Le\",null,{\"children\":[\"$\",\"$a\",null,{\"name\":\"Next.Metadata\",\"children\":\"$Lf\"}]}]}],null]}],false]],\"m\":\"$undefined\",\"G\":[\"$10\",[]],\"S\":true}\n"])</script><script>self.__next_f.push([1,"7:{}\n8:\"$0:f:0:1:1:children:0:props:children:0:props:serverProvidedParams:params\"\n"])</script><script>self.__next_f.push([1,"d:[[\"$\",\"meta\",\"0\",{\"charSet\":\"utf-8\"}],[\"$\",\"meta\",\"1\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"}]]\n"])</script><script>self.__next_f.push([1,"11:I[27201,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"IconMark\"]\nb:null\nf:[[\"$\",\"title\",\"0\",{\"children\":\"Poker GTO Solver\"}],[\"$\",\"meta\",\"1\",{\"name\":\"description\",\"content\":\"Game Theory Optimal poker solver with GPU acceleration\"}],[\"$\",\"link\",\"2\",{\"rel\":\"icon\",\"href\":\"/favicon.ico?favicon.0b3bf435.ico\",\"sizes\":\"256x256\",\"type\":\"image/x-icon\"}],[\"$\",\"$L11\",\"3\",{}]]\n"])</script></body></html>
