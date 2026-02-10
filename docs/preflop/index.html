@@ -1,0 +1,696 @@
+<!DOCTYPE html><!--D0VCQUTCQW4eXOWUMx1cv--><html lang="en" class="dark"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="/_next/static/chunks/56d78e76a154c7e5.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/05be8470af537e1f.js"/><script src="/_next/static/chunks/f2f58a7e93290fbb.js" async=""></script><script src="/_next/static/chunks/0d1bcf8db95909b4.js" async=""></script><script src="/_next/static/chunks/turbopack-1418416b5a9a1600.js" async=""></script><script src="/_next/static/chunks/527435da958e8831.js" async=""></script><script src="/_next/static/chunks/ff1a16fafef87110.js" async=""></script><script src="/_next/static/chunks/d2be314c3ece3fbe.js" async=""></script><script src="/_next/static/chunks/6d9bd183ef138395.js" async=""></script><title>GTO Poker Solver - GPU Accelerated</title><meta name="description" content="A professional-grade Game Theory Optimal poker solver with WebGPU acceleration. Built on CFR algorithm principles from Applications of No-Limit Hold&#x27;em by Matthew Janda."/><link rel="icon" href="/favicon.ico?favicon.0b3bf435.ico" sizes="256x256" type="image/x-icon"/><script src="/_next/static/chunks/a6dad97d9634a72d.js" noModule=""></script></head><body class="antialiased bg-gray-950 text-gray-100 min-h-screen font-sans"><div hidden=""><!--$--><!--/$--></div><nav class="bg-gray-900 border-b border-gray-800"><div class="max-w-7xl mx-auto px-4"><div class="flex items-center justify-between h-14"><div class="flex items-center gap-2"><span class="text-xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">GTO Solver</span><span class="text-[10px] text-gray-600 bg-gray-800 px-2 py-0.5 rounded-full">WebGPU</span></div><div class="flex items-center gap-1"><a class="
+                    px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+                    text-gray-400 hover:text-gray-200 hover:bg-gray-800/50
+                  " href="/"><span class="mr-1.5">⚙</span>Solver</a><a class="
+                    px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+                    text-gray-400 hover:text-gray-200 hover:bg-gray-800/50
+                  " href="/preflop/"><span class="mr-1.5">♠</span>Preflop Charts</a><a class="
+                    px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+                    text-gray-400 hover:text-gray-200 hover:bg-gray-800/50
+                  " href="/equity/"><span class="mr-1.5">📊</span>Equity Calculator</a></div><div class="flex items-center gap-2 text-xs text-gray-500"><span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>GPU Ready</span></div></div></div></nav><main class="max-w-7xl mx-auto px-4 py-6"><div class="space-y-6"><div><h1 class="text-2xl font-bold">Preflop GTO Charts</h1><p class="text-sm text-gray-500 mt-1">Raise First In (RFI), 3-bet, 4-bet, and defense ranges derived from Janda&#x27;s mathematical framework. All frequencies are based on 6-max, 100bb deep play.</p></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-6"><div class="space-y-4"><div class="bg-gray-900 rounded-lg p-4 border border-gray-800"><h2 class="text-sm font-semibold text-gray-300 mb-3">Position</h2><div class="grid grid-cols-3 gap-1"><button class="px-3 py-2 rounded text-xs font-semibold transition-colors
+                    bg-gray-800 text-gray-400 hover:bg-gray-700">UTG<span class="block text-[10px] opacity-60">15<!-- -->%</span></button><button class="px-3 py-2 rounded text-xs font-semibold transition-colors
+                    bg-gray-800 text-gray-400 hover:bg-gray-700">MP<span class="block text-[10px] opacity-60">18<!-- -->%</span></button><button class="px-3 py-2 rounded text-xs font-semibold transition-colors
+                    bg-gray-800 text-gray-400 hover:bg-gray-700">CO<span class="block text-[10px] opacity-60">25<!-- -->%</span></button><button class="px-3 py-2 rounded text-xs font-semibold transition-colors
+                    bg-blue-600 text-white">BTN<span class="block text-[10px] opacity-60">40<!-- -->%</span></button><button class="px-3 py-2 rounded text-xs font-semibold transition-colors
+                    bg-gray-800 text-gray-400 hover:bg-gray-700">SB<span class="block text-[10px] opacity-60">35<!-- -->%</span></button><button class="px-3 py-2 rounded text-xs font-semibold transition-colors
+                    bg-gray-800 text-gray-400 hover:bg-gray-700">BB</button></div></div><div class="bg-gray-900 rounded-lg p-4 border border-gray-800"><h2 class="text-sm font-semibold text-gray-300 mb-3">Chart Type</h2><div class="space-y-1"><button class="w-full text-left px-3 py-2 rounded transition-colors
+                    bg-blue-600/20 text-blue-400 border border-blue-600/50"><div class="text-xs font-semibold">Raise First In (RFI)</div><div class="text-[10px] opacity-60">Hands to open from this position</div></button><button class="w-full text-left px-3 py-2 rounded transition-colors
+                    bg-gray-800 text-gray-400 hover:bg-gray-700 border border-transparent"><div class="text-xs font-semibold">3-Bet Range</div><div class="text-[10px] opacity-60">Hands to 3-bet vs BTN open</div></button><button class="w-full text-left px-3 py-2 rounded transition-colors
+                    bg-gray-800 text-gray-400 hover:bg-gray-700 border border-transparent"><div class="text-xs font-semibold">4-Bet Range</div><div class="text-[10px] opacity-60">Hands BTN 4-bets with</div></button><button class="w-full text-left px-3 py-2 rounded transition-colors
+                    bg-gray-800 text-gray-400 hover:bg-gray-700 border border-transparent"><div class="text-xs font-semibold">BB Defense</div><div class="text-[10px] opacity-60">Hands BB calls vs BTN open</div></button></div></div><div class="bg-gray-900 rounded-lg p-4 border border-gray-800"><h2 class="text-sm font-semibold text-gray-300 mb-3">GTO Frequencies (Janda)</h2><div class="space-y-2"><div class="text-xs"><div class="flex items-center justify-between"><span class="text-gray-400">3bet bluff needs folds</span><span class="font-mono text-blue-400">67<!-- -->-<!-- -->70<!-- -->%</span></div><div class="text-[10px] text-gray-600 mt-0.5">3-bet bluffs need folds 67-70% of the time for immediate profit</div></div><div class="text-xs"><div class="flex items-center justify-between"><span class="text-gray-400">4bet bluff needs folds</span><span class="font-mono text-blue-400">54<!-- -->-<!-- -->60<!-- -->%</span></div><div class="text-[10px] text-gray-600 mt-0.5">4-bet bluffs need folds 54-60% of the time</div></div><div class="text-xs"><div class="flex items-center justify-between"><span class="text-gray-400">5bet bluff needs folds</span><span class="font-mono text-blue-400">40<!-- -->-<!-- -->50<!-- -->%</span></div><div class="text-[10px] text-gray-600 mt-0.5">5-bet bluffs need folds 40-50% of the time</div></div><div class="text-xs"><div class="flex items-center justify-between"><span class="text-gray-400">defend vs 3bet</span><span class="font-mono text-blue-400">27<!-- -->-<!-- -->31<!-- -->%</span></div><div class="text-[10px] text-gray-600 mt-0.5">Opens should defend 27-31% against 3-bets</div></div><div class="text-xs"><div class="flex items-center justify-between"><span class="text-gray-400">3bet defend vs 4bet</span><span class="font-mono text-blue-400">40<!-- -->-<!-- -->46<!-- -->%</span></div><div class="text-[10px] text-gray-600 mt-0.5">3-bet range should defend 40-46% against 4-bets</div></div><div class="text-xs"><div class="flex items-center justify-between"><span class="text-gray-400">4bet defend vs 5bet</span><span class="font-mono text-blue-400">50<!-- -->-<!-- -->60<!-- -->%</span></div><div class="text-[10px] text-gray-600 mt-0.5">4-bet range should call 50-60% of 5-bet jams</div></div></div></div><div class="bg-gray-900 rounded-lg p-4 border border-gray-800"><h2 class="text-sm font-semibold text-gray-300 mb-3">Max 3-Bet vs <!-- -->BTN</h2><div class="space-y-2 text-xs"><div class="flex justify-between"><span class="text-gray-400">Max 3-Bet %</span><span class="font-mono text-yellow-400">16.3<!-- -->%</span></div><div class="flex justify-between"><span class="text-gray-400">Value 3-Bet %</span><span class="font-mono text-green-400">6.52<!-- -->%</span></div><div class="flex justify-between"><span class="text-gray-400">Value Hands</span><span class="font-mono text-gray-300 text-[10px]">TT+, ATs+, KQs, AJo+</span></div></div></div></div><div class="bg-gray-900 rounded-lg p-4 border border-gray-800"><div class="flex items-center justify-between mb-2"><h2 class="text-sm font-semibold text-gray-300">BTN<!-- --> <!-- -->RFI<!-- --> Range</h2><span class="text-xs text-gray-500 font-mono">85.3<!-- -->%</span></div><div class="select-none"><div class="inline-block"><div class="grid gap-[1px]" style="grid-template-columns:repeat(13, minmax(0, 1fr))"><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-blue-600 text-white
+                  " title="AA (6 combos) - 100%">AA</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="AKs (4 combos) - 100%">AKs</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="AQs (4 combos) - 100%">AQs</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="AJs (4 combos) - 100%">AJs</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="ATs (4 combos) - 100%">ATs</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="A9s (4 combos) - 100%">A9s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="A8s (4 combos) - 100%">A8s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="A7s (4 combos) - 100%">A7s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="A6s (4 combos) - 100%">A6s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="A5s (4 combos) - 100%">A5s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="A4s (4 combos) - 100%">A4s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="A3s (4 combos) - 100%">A3s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="A2s (4 combos) - 100%">A2s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="AKo (12 combos) - 100%">AKo</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-blue-600 text-white
+                  " title="KK (6 combos) - 100%">KK</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="KQs (4 combos) - 100%">KQs</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="KJs (4 combos) - 100%">KJs</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="KTs (4 combos) - 100%">KTs</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="K9s (4 combos) - 100%">K9s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="K8s (4 combos) - 100%">K8s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="K7s (4 combos) - 100%">K7s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="K6s (4 combos) - 100%">K6s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " style="background-color:rgba(34, 197, 94, 0.33333333333333337)" title="K5s (4 combos) - 17%">K5s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="K4s (4 combos) - 0%">K4s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="K3s (4 combos) - 0%">K3s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="K2s (4 combos) - 0%">K2s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="AQo (12 combos) - 100%">AQo</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="KQo (12 combos) - 100%">KQo</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-blue-600 text-white
+                  " title="QQ (6 combos) - 100%">QQ</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="QJs (4 combos) - 100%">QJs</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="QTs (4 combos) - 100%">QTs</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="Q9s (4 combos) - 100%">Q9s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="Q8s (4 combos) - 100%">Q8s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="Q7s (4 combos) - 100%">Q7s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="Q6s (4 combos) - 100%">Q6s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " style="background-color:rgba(34, 197, 94, 0.33333333333333337)" title="Q5s (4 combos) - 17%">Q5s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="Q4s (4 combos) - 0%">Q4s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="Q3s (4 combos) - 0%">Q3s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="Q2s (4 combos) - 0%">Q2s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="AJo (12 combos) - 100%">AJo</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="KJo (12 combos) - 100%">KJo</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="QJo (12 combos) - 100%">QJo</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-blue-600 text-white
+                  " title="JJ (6 combos) - 100%">JJ</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="JTs (4 combos) - 100%">JTs</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="J9s (4 combos) - 100%">J9s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="J8s (4 combos) - 100%">J8s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="J7s (4 combos) - 100%">J7s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="J6s (4 combos) - 100%">J6s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " style="background-color:rgba(34, 197, 94, 0.33333333333333337)" title="J5s (4 combos) - 17%">J5s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="J4s (4 combos) - 0%">J4s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="J3s (4 combos) - 0%">J3s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="J2s (4 combos) - 0%">J2s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="ATo (12 combos) - 100%">ATo</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="KTo (12 combos) - 100%">KTo</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="QTo (12 combos) - 100%">QTo</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="JTo (12 combos) - 100%">JTo</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-blue-600 text-white
+                  " title="TT (6 combos) - 100%">TT</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="T9s (4 combos) - 100%">T9s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="T8s (4 combos) - 100%">T8s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="T7s (4 combos) - 100%">T7s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="T6s (4 combos) - 100%">T6s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " style="background-color:rgba(34, 197, 94, 0.33333333333333337)" title="T5s (4 combos) - 17%">T5s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="T4s (4 combos) - 0%">T4s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="T3s (4 combos) - 0%">T3s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="T2s (4 combos) - 0%">T2s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="A9o (12 combos) - 100%">A9o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="K9o (12 combos) - 100%">K9o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="Q9o (12 combos) - 100%">Q9o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="J9o (12 combos) - 100%">J9o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="T9o (12 combos) - 100%">T9o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-blue-600 text-white
+                  " title="99 (6 combos) - 100%">99</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="98s (4 combos) - 100%">98s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="97s (4 combos) - 100%">97s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="96s (4 combos) - 100%">96s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " style="background-color:rgba(34, 197, 94, 0.33333333333333337)" title="95s (4 combos) - 17%">95s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="94s (4 combos) - 0%">94s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="93s (4 combos) - 0%">93s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="92s (4 combos) - 0%">92s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="A8o (12 combos) - 100%">A8o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="K8o (12 combos) - 100%">K8o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="Q8o (12 combos) - 100%">Q8o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="J8o (12 combos) - 100%">J8o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="T8o (12 combos) - 100%">T8o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="98o (12 combos) - 100%">98o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-blue-600 text-white
+                  " title="88 (6 combos) - 100%">88</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="87s (4 combos) - 100%">87s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="86s (4 combos) - 100%">86s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " style="background-color:rgba(34, 197, 94, 0.33333333333333337)" title="85s (4 combos) - 17%">85s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="84s (4 combos) - 0%">84s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="83s (4 combos) - 0%">83s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="82s (4 combos) - 0%">82s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="A7o (12 combos) - 100%">A7o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="K7o (12 combos) - 100%">K7o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="Q7o (12 combos) - 100%">Q7o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="J7o (12 combos) - 100%">J7o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="T7o (12 combos) - 100%">T7o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="97o (12 combos) - 100%">97o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="87o (12 combos) - 100%">87o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-blue-600 text-white
+                  " title="77 (6 combos) - 100%">77</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " title="76s (4 combos) - 100%">76s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " style="background-color:rgba(34, 197, 94, 0.33333333333333337)" title="75s (4 combos) - 17%">75s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="74s (4 combos) - 0%">74s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="73s (4 combos) - 0%">73s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="72s (4 combos) - 0%">72s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="A6o (12 combos) - 100%">A6o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="K6o (12 combos) - 100%">K6o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="Q6o (12 combos) - 100%">Q6o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="J6o (12 combos) - 100%">J6o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="T6o (12 combos) - 100%">T6o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="96o (12 combos) - 100%">96o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="86o (12 combos) - 100%">86o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="76o (12 combos) - 100%">76o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-blue-600 text-white
+                  " title="66 (6 combos) - 100%">66</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-green-600 text-white
+                  " style="background-color:rgba(34, 197, 94, 0.33333333333333337)" title="65s (4 combos) - 17%">65s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="64s (4 combos) - 0%">64s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="63s (4 combos) - 0%">63s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="62s (4 combos) - 0%">62s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="A5o (12 combos) - 100%">A5o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="K5o (12 combos) - 100%">K5o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="Q5o (12 combos) - 100%">Q5o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="J5o (12 combos) - 100%">J5o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="T5o (12 combos) - 100%">T5o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="95o (12 combos) - 100%">95o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="85o (12 combos) - 100%">85o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="75o (12 combos) - 100%">75o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="65o (12 combos) - 100%">65o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-blue-600 text-white
+                  " title="55 (6 combos) - 100%">55</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="54s (4 combos) - 0%">54s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="53s (4 combos) - 0%">53s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="52s (4 combos) - 0%">52s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="A4o (12 combos) - 100%">A4o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="K4o (12 combos) - 100%">K4o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="Q4o (12 combos) - 100%">Q4o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="J4o (12 combos) - 100%">J4o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="T4o (12 combos) - 100%">T4o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="94o (12 combos) - 100%">94o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="84o (12 combos) - 100%">84o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="74o (12 combos) - 100%">74o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="64o (12 combos) - 100%">64o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="54o (12 combos) - 100%">54o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-blue-600 text-white
+                  " title="44 (6 combos) - 100%">44</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="43s (4 combos) - 0%">43s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="42s (4 combos) - 0%">42s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="A3o (12 combos) - 100%">A3o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="K3o (12 combos) - 100%">K3o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="Q3o (12 combos) - 100%">Q3o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="J3o (12 combos) - 100%">J3o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="T3o (12 combos) - 100%">T3o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="93o (12 combos) - 100%">93o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="83o (12 combos) - 100%">83o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="73o (12 combos) - 100%">73o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="63o (12 combos) - 100%">63o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="53o (12 combos) - 100%">53o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " style="background-color:rgba(239, 68, 68, 0.33333333333333337)" title="43o (12 combos) - 17%">43o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-blue-600 text-white
+                  " title="33 (6 combos) - 100%">33</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="32s (4 combos) - 0%">32s</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="A2o (12 combos) - 100%">A2o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="K2o (12 combos) - 100%">K2o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="Q2o (12 combos) - 100%">Q2o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="J2o (12 combos) - 100%">J2o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="T2o (12 combos) - 100%">T2o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="92o (12 combos) - 100%">92o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="82o (12 combos) - 100%">82o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " title="72o (12 combos) - 100%">72o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " style="background-color:rgba(239, 68, 68, 0.7333333333333334)" title="62o (12 combos) - 67%">62o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-red-600/80 text-white
+                  " style="background-color:rgba(239, 68, 68, 0.33333333333333337)" title="52o (12 combos) - 17%">52o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="42o (12 combos) - 0%">42o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-gray-800 text-gray-500 hover:bg-gray-700
+                  " title="32o (12 combos) - 0%">32o</div><div class="
+                    w-[42px] h-[34px] flex items-center justify-center text-[10px] font-mono
+                    cursor-pointer border border-gray-700/50 rounded-[2px] transition-colors
+                    bg-blue-600 text-white
+                  " title="22 (6 combos) - 100%">22</div></div></div><div class="mt-3 flex items-center justify-between"><div class="text-sm text-gray-400"><span class="font-semibold text-white">85.3<!-- -->%</span> of hands<span class="text-gray-500 ml-2">(<!-- -->1131<!-- --> combos)</span></div><div class="flex gap-1"><button class="px-2 py-1 text-[10px] bg-gray-700 hover:bg-gray-600 rounded text-gray-300">All</button><button class="px-2 py-1 text-[10px] bg-gray-700 hover:bg-gray-600 rounded text-gray-300">Clear</button><button class="px-2 py-1 text-[10px] bg-blue-800 hover:bg-blue-700 rounded text-blue-200">Pairs</button><button class="px-2 py-1 text-[10px] bg-green-800 hover:bg-green-700 rounded text-green-200">Suited</button><button class="px-2 py-1 text-[10px] bg-yellow-800 hover:bg-yellow-700 rounded text-yellow-200">Broadway</button></div></div><div class="mt-2 flex gap-4 text-[10px] text-gray-500"><span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-600 rounded-sm inline-block"></span> Pairs</span><span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-600 rounded-sm inline-block"></span> Suited</span><span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-600/80 rounded-sm inline-block"></span> Offsuit</span></div></div></div><div class="space-y-4"><div class="bg-gray-900 rounded-lg p-4 border border-gray-800"><h2 class="text-sm font-semibold text-gray-300 mb-3">Preflop Math Lab</h2><div class="space-y-3"><div class="grid grid-cols-2 gap-2"><div><label class="block text-[10px] text-gray-500 mb-0.5">Open Size (bb)</label><input type="number" class="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs" step="0.5" min="2" max="5" value="2.5"/></div><div><label class="block text-[10px] text-gray-500 mb-0.5">3-Bet Size (bb)</label><input type="number" class="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs" step="1" min="6" max="15" value="8"/></div><div><label class="block text-[10px] text-gray-500 mb-0.5">4-Bet Size (bb)</label><input type="number" class="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs" step="1" min="15" max="30" value="20"/></div><div><label class="block text-[10px] text-gray-500 mb-0.5">Blinds Total</label><input type="number" class="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs" step="0.5" min="1" max="3" value="1.5"/></div></div></div><div class="mt-4 space-y-3"><div class="p-3 bg-gray-800 rounded"><h3 class="text-[10px] text-gray-500 uppercase mb-2">3-Bet Defense Requirements</h3><div class="grid grid-cols-2 gap-2 text-xs"><div><span class="text-gray-500">3-Bet needs folds:</span><span class="ml-1 font-mono text-red-400">66.7<!-- -->%</span></div><div><span class="text-gray-500">Min defense:</span><span class="ml-1 font-mono text-green-400">33.3<!-- -->%</span></div><div class="col-span-2"><span class="text-gray-500">Max combined 3-bet:</span><span class="ml-1 font-mono text-yellow-400">37.5<!-- -->%</span></div></div></div><div class="p-3 bg-gray-800 rounded"><h3 class="text-[10px] text-gray-500 uppercase mb-2">3-Bet Range Composition</h3><div class="grid grid-cols-2 gap-2 text-xs"><div><span class="text-gray-500">Value %:</span><span class="ml-1 font-mono text-green-400">43.0<!-- -->%</span></div><div><span class="text-gray-500">Bluff %:</span><span class="ml-1 font-mono text-red-400">57.0<!-- -->%</span></div></div><div class="mt-2 w-full bg-gray-700 rounded-full h-3 overflow-hidden flex"><div class="bg-green-500 h-full" style="width:43%"></div><div class="bg-red-500/70 h-full flex-1"></div></div><div class="flex justify-between text-[10px] text-gray-600 mt-1"><span>Value</span><span>Bluffs</span></div></div><div class="p-3 bg-gray-800 rounded"><h3 class="text-[10px] text-gray-500 uppercase mb-2">Opening EV (weakest hand)</h3><div class="text-xs"><span class="text-gray-500">EV of opening:</span><span class="ml-1 font-mono text-green-400">+<!-- -->0.020<!-- --> bb</span></div><div class="text-[10px] text-gray-600 mt-1">From Janda: EV = (fold%)(blinds) + (call%)(EV|called) - (3bet%)(open_size)</div></div></div></div><div class="bg-gray-900 rounded-lg p-4 border border-gray-800"><h2 class="text-sm font-semibold text-gray-300 mb-3">Position Guide</h2><div class="space-y-2 text-xs"><div class="flex items-center gap-2 p-2 bg-gray-800 rounded"><span class="w-8 text-center font-bold text-gray-500">UTG</span><div class="flex-1 bg-gray-700 rounded-full h-3 overflow-hidden"><div class="bg-blue-500/60 h-full transition-all" style="width:15%"></div></div><span class="font-mono text-gray-400 w-12 text-right">15<!-- -->%</span><span class="text-gray-600">|</span><span class="font-mono text-gray-400 w-10 text-right">3<!-- -->x</span></div><div class="flex items-center gap-2 p-2 bg-gray-800 rounded"><span class="w-8 text-center font-bold text-gray-500">MP</span><div class="flex-1 bg-gray-700 rounded-full h-3 overflow-hidden"><div class="bg-blue-500/60 h-full transition-all" style="width:18%"></div></div><span class="font-mono text-gray-400 w-12 text-right">18<!-- -->%</span><span class="text-gray-600">|</span><span class="font-mono text-gray-400 w-10 text-right">3<!-- -->x</span></div><div class="flex items-center gap-2 p-2 bg-gray-800 rounded"><span class="w-8 text-center font-bold text-gray-500">CO</span><div class="flex-1 bg-gray-700 rounded-full h-3 overflow-hidden"><div class="bg-blue-500/60 h-full transition-all" style="width:25%"></div></div><span class="font-mono text-gray-400 w-12 text-right">25<!-- -->%</span><span class="text-gray-600">|</span><span class="font-mono text-gray-400 w-10 text-right">2.5<!-- -->x</span></div><div class="flex items-center gap-2 p-2 bg-gray-800 rounded"><span class="w-8 text-center font-bold text-blue-400">BTN</span><div class="flex-1 bg-gray-700 rounded-full h-3 overflow-hidden"><div class="bg-blue-500/60 h-full transition-all" style="width:40%"></div></div><span class="font-mono text-gray-400 w-12 text-right">40<!-- -->%</span><span class="text-gray-600">|</span><span class="font-mono text-gray-400 w-10 text-right">2.5<!-- -->x</span></div><div class="flex items-center gap-2 p-2 bg-gray-800 rounded"><span class="w-8 text-center font-bold text-gray-500">SB</span><div class="flex-1 bg-gray-700 rounded-full h-3 overflow-hidden"><div class="bg-blue-500/60 h-full transition-all" style="width:35%"></div></div><span class="font-mono text-gray-400 w-12 text-right">35<!-- -->%</span><span class="text-gray-600">|</span><span class="font-mono text-gray-400 w-10 text-right">3<!-- -->x</span></div></div></div><div class="bg-gray-900 rounded-lg p-4 border border-gray-800"><h2 class="text-sm font-semibold text-gray-300 mb-3">Key GTO Concepts</h2><div class="space-y-3 text-xs text-gray-500"><div><span class="text-gray-400 font-semibold">Nash Equilibrium:</span> A strategy where neither player has incentive to deviate. An optimal player always takes the most +EV line.</div><div><span class="text-gray-400 font-semibold">Polarized Range:</span> Strong hands + bluffs, few medium hands. Betting/raising ranges are typically polarized.</div><div><span class="text-gray-400 font-semibold">Condensed Range:</span> Mostly medium-strength hands. Calling ranges are typically condensed.</div><div><span class="text-gray-400 font-semibold">Indifference:</span> Making opponent break even with bluff catchers so they can&#x27;t exploit your bet sizing.</div><div><span class="text-gray-400 font-semibold">MDF:</span> Minimum Defense Frequency = P / (P + B). How often you must defend to prevent profitable bluffs.</div></div></div></div></div></div><!--$--><!--/$--></main><script src="/_next/static/chunks/05be8470af537e1f.js" id="_R_" async=""></script><script>(self.__next_f=self.__next_f||[]).push([0])</script><script>self.__next_f.push([1,"1:\"$Sreact.fragment\"\n2:I[88589,[\"/_next/static/chunks/527435da958e8831.js\"],\"default\"]\n3:I[39756,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"default\"]\n4:I[37457,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"default\"]\n5:I[47257,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"ClientPageRoot\"]\n6:I[56337,[\"/_next/static/chunks/527435da958e8831.js\",\"/_next/static/chunks/6d9bd183ef138395.js\"],\"default\"]\n9:I[97367,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"OutletBoundary\"]\na:\"$Sreact.suspense\"\nc:I[97367,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"ViewportBoundary\"]\ne:I[97367,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"MetadataBoundary\"]\n10:I[68027,[],\"default\"]\n:HL[\"/_next/static/chunks/56d78e76a154c7e5.css\",\"style\"]\n"])</script><script>self.__next_f.push([1,"0:{\"P\":null,\"b\":\"D0VCQUTCQW4eXOWUMx1cv\",\"c\":[\"\",\"preflop\",\"\"],\"q\":\"\",\"i\":false,\"f\":[[[\"\",{\"children\":[\"preflop\",{\"children\":[\"__PAGE__\",{}]}]},\"$undefined\",\"$undefined\",true],[[\"$\",\"$1\",\"c\",{\"children\":[[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/chunks/56d78e76a154c7e5.css\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}],[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/527435da958e8831.js\",\"async\":true,\"nonce\":\"$undefined\"}]],[\"$\",\"html\",null,{\"lang\":\"en\",\"className\":\"dark\",\"children\":[\"$\",\"body\",null,{\"className\":\"antialiased bg-gray-950 text-gray-100 min-h-screen font-sans\",\"children\":[[\"$\",\"$L2\",null,{}],[\"$\",\"main\",null,{\"className\":\"max-w-7xl mx-auto px-4 py-6\",\"children\":[\"$\",\"$L3\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L4\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"}],[\"$\",\"div\",null,{\"style\":{\"fontFamily\":\"system-ui,\\\"Segoe UI\\\",Roboto,Helvetica,Arial,sans-serif,\\\"Apple Color Emoji\\\",\\\"Segoe UI Emoji\\\"\",\"height\":\"100vh\",\"textAlign\":\"center\",\"display\":\"flex\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}}],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":{\"display\":\"inline-block\",\"margin\":\"0 20px 0 0\",\"padding\":\"0 23px 0 0\",\"fontSize\":24,\"fontWeight\":500,\"verticalAlign\":\"top\",\"lineHeight\":\"49px\"},\"children\":404}],[\"$\",\"div\",null,{\"style\":{\"display\":\"inline-block\"},\"children\":[\"$\",\"h2\",null,{\"style\":{\"fontSize\":14,\"fontWeight\":400,\"lineHeight\":\"49px\",\"margin\":0},\"children\":\"This page could not be found.\"}]}]]}]}]],[]],\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\"}]}]]}]}]]}],{\"children\":[[\"$\",\"$1\",\"c\",{\"children\":[null,[\"$\",\"$L3\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L4\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":\"$undefined\",\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\"}]]}],{\"children\":[[\"$\",\"$1\",\"c\",{\"children\":[[\"$\",\"$L5\",null,{\"Component\":\"$6\",\"serverProvidedParams\":{\"searchParams\":{},\"params\":{},\"promises\":[\"$@7\",\"$@8\"]}}],[[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/6d9bd183ef138395.js\",\"async\":true,\"nonce\":\"$undefined\"}]],[\"$\",\"$L9\",null,{\"children\":[\"$\",\"$a\",null,{\"name\":\"Next.MetadataOutlet\",\"children\":\"$@b\"}]}]]}],{},null,false,false]},null,false,false]},null,false,false],[\"$\",\"$1\",\"h\",{\"children\":[null,[\"$\",\"$Lc\",null,{\"children\":\"$Ld\"}],[\"$\",\"div\",null,{\"hidden\":true,\"children\":[\"$\",\"$Le\",null,{\"children\":[\"$\",\"$a\",null,{\"name\":\"Next.Metadata\",\"children\":\"$Lf\"}]}]}],null]}],false]],\"m\":\"$undefined\",\"G\":[\"$10\",[]],\"S\":true}\n"])</script><script>self.__next_f.push([1,"7:{}\n8:\"$0:f:0:1:1:children:1:children:0:props:children:0:props:serverProvidedParams:params\"\n"])</script><script>self.__next_f.push([1,"d:[[\"$\",\"meta\",\"0\",{\"charSet\":\"utf-8\"}],[\"$\",\"meta\",\"1\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"}]]\n"])</script><script>self.__next_f.push([1,"11:I[27201,[\"/_next/static/chunks/ff1a16fafef87110.js\",\"/_next/static/chunks/d2be314c3ece3fbe.js\"],\"IconMark\"]\nb:null\nf:[[\"$\",\"title\",\"0\",{\"children\":\"GTO Poker Solver - GPU Accelerated\"}],[\"$\",\"meta\",\"1\",{\"name\":\"description\",\"content\":\"A professional-grade Game Theory Optimal poker solver with WebGPU acceleration. Built on CFR algorithm principles from Applications of No-Limit Hold'em by Matthew Janda.\"}],[\"$\",\"link\",\"2\",{\"rel\":\"icon\",\"href\":\"/favicon.ico?favicon.0b3bf435.ico\",\"sizes\":\"256x256\",\"type\":\"image/x-icon\"}],[\"$\",\"$L11\",\"3\",{}]]\n"])</script></body></html>
