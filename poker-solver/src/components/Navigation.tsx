@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -12,6 +12,9 @@ const NAV_ITEMS = [
 
 export default function Navigation() {
   const pathname = usePathname();
+  // Defer active-tab highlight to after hydration to avoid SSR/client mismatch
+  const [currentPath, setCurrentPath] = useState('');
+  useEffect(() => { setCurrentPath(pathname); }, [pathname]);
 
   return (
     <nav
@@ -25,7 +28,7 @@ export default function Navigation() {
     >
       <div className="max-w-lg mx-auto flex items-center justify-around" style={{ height: 64 }}>
         {NAV_ITEMS.map((item) => {
-          const isActive = pathname === item.href || pathname === item.href.slice(0, -1);
+          const isActive = currentPath === item.href || currentPath === item.href.slice(0, -1);
           return (
             <Link
               key={item.href}
