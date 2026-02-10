@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useRef, useCallback } from 'react';
 import { CardIndex, RANKS, SUITS, Suit, cardToIndex, indexToCard } from '@/engine/types';
 
 interface BoardSelectorProps {
@@ -12,13 +12,7 @@ interface BoardSelectorProps {
 }
 
 const SUIT_SYMBOL: Record<Suit, string> = { s: '\u2660', h: '\u2665', d: '\u2666', c: '\u2663' };
-const SUIT_COLOR: Record<Suit, string> = { s: 'suit-black', h: 'suit-red', d: 'suit-red', c: 'suit-black' };
-const SUIT_BG: Record<Suit, string> = {
-  s: 'rgba(30,41,59,0.08)',
-  h: 'rgba(220,38,38,0.06)',
-  d: 'rgba(220,38,38,0.06)',
-  c: 'rgba(30,41,59,0.08)',
-};
+const SUIT_INLINE: Record<Suit, string> = { s: '#1e293b', h: '#dc2626', d: '#dc2626', c: '#1e293b' };
 
 const DISPLAY_RANKS = [...RANKS].reverse(); // A K Q J T 9 8 7 6 5 4 3 2
 
@@ -29,34 +23,45 @@ export default function BoardSelector({
   deadCards = [],
   label = 'Board',
 }: BoardSelectorProps) {
+  // Use refs to always have current values in callbacks without stale closures
+  const selectedRef = useRef(selectedCards);
+  selectedRef.current = selectedCards;
+  const deadRef = useRef(deadCards);
+  deadRef.current = deadCards;
+
+  const handleCardClick = useCallback((idx: CardIndex) => {
+    const current = selectedRef.current;
+    const dead = new Set(deadRef.current);
+    if (dead.has(idx)) return;
+
+    if (current.includes(idx)) {
+      onCardsChange(current.filter(c => c !== idx));
+    } else if (current.length < maxCards) {
+      onCardsChange([...current, idx]);
+    }
+  }, [onCardsChange, maxCards]);
+
   const deadSet = new Set(deadCards);
   const selectedSet = new Set(selectedCards);
-
-  const toggleCard = useCallback((idx: CardIndex) => {
-    if (deadSet.has(idx)) return;
-    if (selectedSet.has(idx)) {
-      onCardsChange(selectedCards.filter(c => c !== idx));
-    } else if (selectedCards.length < maxCards) {
-      onCardsChange([...selectedCards, idx]);
-    }
-  }, [selectedCards, onCardsChange, maxCards, deadCards]);
 
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-semibold" style={{ color: '#c9d1d9' }}>{label}</span>
-        <div className="flex items-center gap-3">
-          <span className="text-xs" style={{ color: '#484f58' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <span style={{ fontSize: 14, fontWeight: 600, color: '#c9d1d9' }}>{label}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: 12, color: '#484f58' }}>
             {selectedCards.length}/{maxCards}
           </span>
           {selectedCards.length > 0 && (
             <button
               type="button"
               onClick={() => onCardsChange([])}
-              onTouchEnd={(e) => { e.preventDefault(); onCardsChange([]); }}
-              className="text-xs px-2.5 py-1 rounded-lg touch-manipulation"
-              style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171' }}
+              style={{
+                fontSize: 12, padding: '4px 10px', borderRadius: 8,
+                background: 'rgba(239,68,68,0.15)', color: '#f87171',
+                border: 'none', touchAction: 'manipulation', cursor: 'pointer',
+              }}
             >
               Clear
             </button>
@@ -65,36 +70,36 @@ export default function BoardSelector({
       </div>
 
       {/* Selected cards display */}
-      <div className="flex gap-2 mb-4 justify-center items-center" style={{ minHeight: 72 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, justifyContent: 'center', alignItems: 'center', minHeight: 72 }}>
         {selectedCards.map((idx) => {
           const card = indexToCard(idx);
           return (
             <button
               key={idx}
               type="button"
-              onClick={() => toggleCard(idx)}
-              onTouchEnd={(e) => { e.preventDefault(); toggleCard(idx); }}
-              className="flex flex-col items-center justify-center rounded-lg touch-manipulation"
+              onClick={() => handleCardClick(idx)}
               style={{
                 width: 52, height: 72,
-                background: '#fbbf24',
-                border: '2px solid #f59e0b',
+                background: '#fbbf24', border: '2px solid #f59e0b',
                 boxShadow: '0 2px 10px rgba(251,191,36,0.4)',
+                borderRadius: 8, display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', touchAction: 'manipulation',
               }}
             >
-              <span className={`text-lg font-bold ${SUIT_COLOR[card.suit]}`}>{card.rank}</span>
-              <span className={`text-base ${SUIT_COLOR[card.suit]}`}>{SUIT_SYMBOL[card.suit]}</span>
+              <span style={{ fontSize: 18, fontWeight: 700, color: SUIT_INLINE[card.suit] }}>{card.rank}</span>
+              <span style={{ fontSize: 16, color: SUIT_INLINE[card.suit] }}>{SUIT_SYMBOL[card.suit]}</span>
             </button>
           );
         })}
         {Array.from({ length: maxCards - selectedCards.length }).map((_, i) => (
           <div
             key={`e-${i}`}
-            className="flex items-center justify-center rounded-lg"
             style={{
               width: 52, height: 72,
-              border: '2px dashed #30363d',
+              border: '2px dashed #30363d', borderRadius: 8,
               background: 'rgba(33,38,45,0.5)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >
             <span style={{ color: '#484f58', fontSize: 24 }}>?</span>
@@ -102,21 +107,16 @@ export default function BoardSelector({
         ))}
       </div>
 
-      {/* Card picker - grouped by suit, 7 columns for bigger targets */}
-      <div className="space-y-1.5">
+      {/* Card picker - grouped by suit, 7 columns for big touch targets */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {SUITS.map(suit => (
           <div key={suit}>
-            {/* Suit row label */}
-            <div className="flex items-center gap-1 mb-1">
-              <span className={`text-sm ${SUIT_COLOR[suit]}`} style={{ width: 16, textAlign: 'center' }}>
-                {SUIT_SYMBOL[suit]}
-              </span>
+            {/* Suit label */}
+            <div style={{ marginBottom: 4, paddingLeft: 2 }}>
+              <span style={{ fontSize: 14, color: SUIT_INLINE[suit] }}>{SUIT_SYMBOL[suit]}</span>
             </div>
-            {/* Cards grid - 7 columns */}
-            <div
-              className="grid gap-1"
-              style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}
-            >
+            {/* Cards in 7-col grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
               {DISPLAY_RANKS.map(rank => {
                 const idx = cardToIndex({ rank, suit });
                 const isSelected = selectedSet.has(idx);
@@ -126,26 +126,34 @@ export default function BoardSelector({
                   <button
                     key={`${rank}${suit}`}
                     type="button"
-                    onClick={() => toggleCard(idx)}
-                    onTouchEnd={(e) => { e.preventDefault(); toggleCard(idx); }}
+                    onClick={() => handleCardClick(idx)}
                     disabled={isDead}
-                    className={`card-btn touch-manipulation flex items-center justify-center ${isDead ? 'dead' : isSelected ? 'selected' : ''}`}
                     style={{
-                      height: 42,
-                      background: isDead ? '#21262d' : isSelected ? '#fbbf24' : SUIT_BG[suit],
-                      borderColor: isSelected ? '#f59e0b' : 'transparent',
+                      height: 44,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      borderRadius: 6,
+                      border: isSelected ? '2px solid #f59e0b' : '2px solid transparent',
+                      background: isDead ? '#1a1e24' : isSelected ? '#fbbf24' : '#f8f9fa',
+                      opacity: isDead ? 0.2 : 1,
+                      cursor: isDead ? 'not-allowed' : 'pointer',
+                      touchAction: 'manipulation',
+                      WebkitTapHighlightColor: 'transparent',
+                      boxShadow: isSelected ? '0 0 8px rgba(251,191,36,0.4)' : '0 1px 2px rgba(0,0,0,0.1)',
+                      padding: 0,
                     }}
                   >
-                    <span
-                      className={`text-sm font-bold ${isDead ? '' : SUIT_COLOR[suit]}`}
-                      style={isDead ? { color: '#484f58' } : undefined}
-                    >
+                    <span style={{
+                      fontSize: 14, fontWeight: 700,
+                      color: isDead ? '#484f58' : SUIT_INLINE[suit],
+                      pointerEvents: 'none',
+                    }}>
                       {rank}
                     </span>
-                    <span
-                      className={`text-xs ml-0.5 ${isDead ? '' : SUIT_COLOR[suit]}`}
-                      style={isDead ? { color: '#484f58' } : undefined}
-                    >
+                    <span style={{
+                      fontSize: 11, marginLeft: 1,
+                      color: isDead ? '#484f58' : SUIT_INLINE[suit],
+                      pointerEvents: 'none',
+                    }}>
                       {SUIT_SYMBOL[suit]}
                     </span>
                   </button>
