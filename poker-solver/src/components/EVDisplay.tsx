@@ -38,12 +38,12 @@ export function EVChip({ ev, label, unit = 'bb', precision = 2, showSign = true,
 }
 
 interface EquityBarProps {
-  equity: number; // 0-1
+  equity: number;
   label?: string;
   height?: number;
 }
 
-export function EquityBar({ equity, label, height = 24 }: EquityBarProps) {
+export function EquityBar({ equity, label, height = 28 }: EquityBarProps) {
   const percentage = equity * 100;
   const color = equity >= 0.5 ? 'bg-green-500' : 'bg-red-500';
   const oppColor = equity >= 0.5 ? 'bg-red-500/50' : 'bg-green-500/50';
@@ -54,16 +54,11 @@ export function EquityBar({ equity, label, height = 24 }: EquityBarProps) {
       <div className="flex items-center gap-2">
         <div className="flex-1 bg-gray-700 rounded-full overflow-hidden" style={{ height }}>
           <div className="flex h-full">
-            <div
-              className={`${color} transition-all duration-500`}
-              style={{ width: `${percentage}%` }}
-            />
-            <div
-              className={`${oppColor} flex-1`}
-            />
+            <div className={`${color} transition-all duration-500`} style={{ width: `${percentage}%` }} />
+            <div className={`${oppColor} flex-1`} />
           </div>
         </div>
-        <span className="text-sm font-mono text-gray-300 w-16 text-right">
+        <span className="text-sm font-mono font-bold text-gray-200 w-16 text-right">
           {percentage.toFixed(1)}%
         </span>
       </div>
@@ -73,7 +68,6 @@ export function EquityBar({ equity, label, height = 24 }: EquityBarProps) {
 
 interface ActionBreakdownProps {
   actions: { action: string; frequency: number; ev: number }[];
-  potSize?: number;
 }
 
 const ACTION_COLORS: Record<string, string> = {
@@ -85,14 +79,14 @@ const ACTION_COLORS: Record<string, string> = {
   all_in: 'bg-purple-500',
 };
 
-export function ActionBreakdown({ actions, potSize }: ActionBreakdownProps) {
+export function ActionBreakdown({ actions }: ActionBreakdownProps) {
   return (
     <div className="space-y-2">
       {actions.map(({ action, frequency, ev }) => (
         <div key={action} className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${ACTION_COLORS[action.split(' ')[0]] || 'bg-gray-500'}`} />
-          <span className="text-sm text-gray-300 w-24 capitalize">{action}</span>
-          <div className="flex-1 bg-gray-700 rounded-full h-4 overflow-hidden">
+          <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${ACTION_COLORS[action.split(' ')[0]] || 'bg-gray-500'}`} />
+          <span className="text-sm text-gray-300 w-16 sm:w-24 capitalize truncate">{action}</span>
+          <div className="flex-1 bg-gray-700 rounded-full h-5 overflow-hidden">
             <div
               className={`h-full ${ACTION_COLORS[action.split(' ')[0]] || 'bg-gray-500'} transition-all duration-300`}
               style={{ width: `${frequency * 100}%` }}
@@ -129,24 +123,22 @@ export function SolverProgress({
   const iterPerSec = timeMs > 0 ? (iteration / (timeMs / 1000)).toFixed(0) : '...';
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+    <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-sm font-semibold text-gray-300">Solver Progress</h4>
         <span className="text-xs text-gray-500">
-          {iteration.toLocaleString()} / {maxIterations.toLocaleString()} iterations
+          {iteration.toLocaleString()} / {maxIterations.toLocaleString()}
         </span>
       </div>
 
-      {/* Progress bar */}
       <div className="w-full bg-gray-700 rounded-full h-3 mb-3 overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-blue-600 to-blue-400 transition-all duration-200 rounded-full"
+          className="h-full bg-gradient-to-r from-blue-600 to-[var(--gold)] transition-all duration-200 rounded-full"
           style={{ width: `${Math.min(progress, 100)}%` }}
         />
       </div>
 
-      {/* Stats grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <div>
           <div className="text-[10px] text-gray-500 uppercase">Exploitability</div>
           <div className={`text-sm font-mono ${exploitability <= targetExploitability ? 'text-green-400' : 'text-yellow-400'}`}>
@@ -154,16 +146,8 @@ export function SolverProgress({
           </div>
         </div>
         <div>
-          <div className="text-[10px] text-gray-500 uppercase">Target</div>
-          <div className="text-sm font-mono text-gray-400">{targetExploitability} bb</div>
-        </div>
-        <div>
           <div className="text-[10px] text-gray-500 uppercase">Speed</div>
           <div className="text-sm font-mono text-gray-400">{iterPerSec} iter/s</div>
-        </div>
-        <div>
-          <div className="text-[10px] text-gray-500 uppercase">Info Sets</div>
-          <div className="text-sm font-mono text-gray-400">{nodeCount.toLocaleString()}</div>
         </div>
       </div>
     </div>
@@ -183,40 +167,38 @@ export function PotOddsDisplay({ potSize, betSize, callAmount }: PotOddsDisplayP
   const valueToBluff = (potSize + betSize) / betSize;
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 space-y-3">
-      <h4 className="text-sm font-semibold text-gray-300">GTO Calculations</h4>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <div className="text-[10px] text-gray-500 uppercase">Pot Odds</div>
-          <div className="text-sm font-mono text-blue-400">
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-gray-800/50 rounded-lg p-3">
+          <div className="text-[10px] text-gray-500 uppercase mb-1">Pot Odds</div>
+          <div className="text-lg font-mono font-bold text-blue-400">
             {(potOdds * 100).toFixed(1)}%
           </div>
-          <div className="text-[10px] text-gray-600">Need {(potOdds * 100).toFixed(1)}% equity to call</div>
+          <div className="text-[10px] text-gray-600">Need this equity to call</div>
         </div>
 
-        <div>
-          <div className="text-[10px] text-gray-500 uppercase">Min Defense Freq (MDF)</div>
-          <div className="text-sm font-mono text-green-400">
+        <div className="bg-gray-800/50 rounded-lg p-3">
+          <div className="text-[10px] text-gray-500 uppercase mb-1">MDF</div>
+          <div className="text-lg font-mono font-bold text-green-400">
             {(mdf * 100).toFixed(1)}%
           </div>
-          <div className="text-[10px] text-gray-600">Must defend at least this much</div>
+          <div className="text-[10px] text-gray-600">Minimum defense</div>
         </div>
 
-        <div>
-          <div className="text-[10px] text-gray-500 uppercase">Bluff Breakeven</div>
-          <div className="text-sm font-mono text-red-400">
+        <div className="bg-gray-800/50 rounded-lg p-3">
+          <div className="text-[10px] text-gray-500 uppercase mb-1">Bluff Breakeven</div>
+          <div className="text-lg font-mono font-bold text-red-400">
             {(bluffFreq * 100).toFixed(1)}%
           </div>
-          <div className="text-[10px] text-gray-600">Bluff needs folds this often</div>
+          <div className="text-[10px] text-gray-600">Folds needed to bluff</div>
         </div>
 
-        <div>
-          <div className="text-[10px] text-gray-500 uppercase">Value:Bluff Ratio</div>
-          <div className="text-sm font-mono text-amber-400">
-            {valueToBluff.toFixed(2)} : 1
+        <div className="bg-gray-800/50 rounded-lg p-3">
+          <div className="text-[10px] text-gray-500 uppercase mb-1">Value:Bluff</div>
+          <div className="text-lg font-mono font-bold text-amber-400">
+            {valueToBluff.toFixed(1)}:1
           </div>
-          <div className="text-[10px] text-gray-600">For balanced river betting</div>
+          <div className="text-[10px] text-gray-600">Balanced bet ratio</div>
         </div>
       </div>
     </div>

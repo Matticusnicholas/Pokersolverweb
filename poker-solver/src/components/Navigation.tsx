@@ -5,56 +5,34 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
-  { href: '/', label: 'Solver', icon: '⚙' },
-  { href: '/preflop', label: 'Preflop Charts', icon: '♠' },
-  { href: '/equity', label: 'Equity Calculator', icon: '📊' },
+  { href: '/', label: 'Solver', icon: '\u2660' },
+  { href: '/preflop/', label: 'Preflop', icon: '\u2665' },
+  { href: '/equity/', label: 'Equity', icon: '\u2666' },
 ];
 
 export default function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-gray-900 border-b border-gray-800">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-14">
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
-              GTO Solver
-            </span>
-            <span className="text-[10px] text-gray-600 bg-gray-800 px-2 py-0.5 rounded-full">
-              WebGPU
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1">
-            {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`
-                    px-3 py-1.5 rounded-md text-sm font-medium transition-colors
-                    ${isActive
-                      ? 'bg-gray-800 text-white'
-                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
-                    }
-                  `}
-                >
-                  <span className="mr-1.5">{item.icon}</span>
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              GPU Ready
-            </span>
-          </div>
-        </div>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#0a1218] border-t border-gray-800 safe-area-bottom md:relative md:bottom-auto md:border-t-0 md:border-b">
+      <div className="max-w-lg mx-auto flex items-center justify-around h-16 md:h-14 px-2">
+        {NAV_ITEMS.map((item) => {
+          const isActive = pathname === item.href || pathname === item.href.slice(0, -1);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-colors min-w-[72px]
+                ${isActive
+                  ? 'text-[#d4a84b]'
+                  : 'text-gray-500 active:text-gray-300'
+                }`}
+            >
+              <span className="text-2xl leading-none">{item.icon}</span>
+              <span className="text-[10px] font-semibold tracking-wide uppercase">{item.label}</span>
+            </Link>
+          );
+        })}
       </div>
     </nav>
   );
